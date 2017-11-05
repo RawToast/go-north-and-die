@@ -5,11 +5,23 @@ import org.junit.Test
 class GoNorthTest {
     val gn = GoNorth()
 
-    @Test fun northTest() {
-        assertEquals("You died", gn.move(Move.NORTH))
+
+    @Test fun whenGivenTheCommandNorthThePlayerDies() {
+
+        val gs = GameState("text", listOf(Move.NORTH))
+
+        val newGs = gn.takeAction(gs, Move.NORTH)
+
+        assertEquals("You went north and died", newGs.gameText)
     }
 
-    @Test fun eastTest() {
-        assertEquals("You died", gn.move(Move.NORTH))
+    @Test fun whenGivenTheCommandEastThePlayerWins() {
+
+        val gs = GameState("text", listOf(Move.EAST))
+
+        val newGs = gn.takeAction(gs, Move.EAST)
+
+        assertEquals("You went east and won", newGs.gameText)
     }
+
 }
