@@ -1,16 +1,19 @@
 // World data structure and building functions
 
 // Basic struct
-data class Place(val description: String, val linkedPlaces: Set<Place>, val moves: Map<Move, String>)
+data class Place(val description: String, val links: Set<Link>)
+
+data class Link(val place: Place, val move: Move, val description: String)
 
 // Basic example
 object World {
+    fun addNewPlace(description: String, from: Place, move: Move, journey: String): Place {
 
-    fun addNewPlace(description: String, from: Place, how: Map<Move, String>): Place {
-        val np = Place(description, setOf(from), mapOf())
-        return from.copy(
-                linkedPlaces = from.linkedPlaces.plus(np),
-                moves = from.moves.plus(how))
+        val np = Place(description, emptySet())
+
+        val link = Link(np, move, journey)
+
+        return from.copy(links = from.links.plus(link))
     }
 
 }
