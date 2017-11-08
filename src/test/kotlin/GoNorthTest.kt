@@ -1,16 +1,16 @@
 
 import org.junit.Test
+import World.linkNewPlace
+import kotlin.test.assertEquals
 
 class GoNorthTest {
     val goNorth = GoNorth()
 
-    val place1 = World.addNewPlace("You went north and died",
-            Place("Starting place", setOf()),
-            Move.NORTH, "You stumble ahead")
-    val place2 = World.addNewPlace("and won!", place1,
-            Move.EAST, "You head east...")
+    val startingPlace = Place("Starting place", setOf())
+            .linkNewPlace(Move.NORTH, "You stumble ahead", "You went north and died")
+            .linkNewPlace(Move.EAST, "You head east...", "and won!")
 
-    val gameState = GameState("You venture into a dark dungeon", place2)
+    val gameState = GameState("You venture into a dark dungeon", startingPlace)
 
     @Test fun thePlayerStartsAtTheStartingPlace() {
         assert(gameState.preText == "You venture into a dark dungeon")
@@ -20,7 +20,7 @@ class GoNorthTest {
     @Test fun whenGivenNorthThePlayerDies() {
         val newState = goNorth.takeAction(gameState, Move.NORTH)
 
-        assert(newState.preText.contains("You stumble ahead"))
+        assertEquals("You stumble ahead", newState.preText)
         assert(newState.place.links.isEmpty())
         assert(newState.place.description.contains("You went north and died"))
     }
@@ -28,7 +28,7 @@ class GoNorthTest {
     @Test fun whenGivenEastThePlayerWins() {
         val newState = goNorth.takeAction(gameState, Move.EAST)
 
-        assert(newState.preText.contains("You head east..."))
+        assertEquals("You head east...", newState.preText)
 
         assert(newState.place.links.isEmpty())
         assert(newState.place.description.contains("and won!"))

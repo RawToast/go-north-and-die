@@ -22,7 +22,8 @@ class GoNorth {
 
 enum class Move {
     NORTH,
-    EAST
+    EAST,
+    WEST
 }
 
 data class GameState(val preText: String, val place: Place)
