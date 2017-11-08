@@ -33,5 +33,4 @@ class GoNorthTest {
         assert(newState.place.links.isEmpty())
         assert(newState.place.description.contains("and won!"))
     }
-
 }

@@ -30,4 +30,21 @@ object World {
 
         return this.copy(links = this.links.plus(link))
     }
+
+    fun Place.twoWayLinkToPlace(place: Place, move: Move, rMove: Move, journey: String, rJourney: String): Place {
+
+        // This logic, shows difficulty in supporting two way links.
+        // The structure may need to move to a set of places and a separate set of links
+        val linkedPlace = this
+                .linkPlace(place, move, journey)
+
+        val newLinks = linkedPlace.links
+                .map { if(it.move == move) it.copy(place = it.place.linkPlace(linkedPlace, rMove, rJourney))
+                       else it}
+                .toSet()
+
+        return linkedPlace.copy(links = newLinks)
+    }
+
+
 }
