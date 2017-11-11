@@ -26,7 +26,7 @@ class GoNorthTest {
                     EAST, WEST, "You head east...", "You stroll west")
             .world
 
-    val gameState = GameStatez("You venture into a dark dungeon", world, location1.id)
+    val gameState = GameState("You venture into a dark dungeon", world, location1.id)
 
     @Test
     fun thePlayerStartsAtTheStartingPlace() {

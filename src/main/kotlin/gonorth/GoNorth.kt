@@ -9,12 +9,12 @@ import java.util.*
 
 class GoNorth {
 
-    fun takeAction(gameStatez: GameStatez, m: Move): GameStatez {
-        return gameStatez.locationOpt()
-                .flatMap { gameStatez.world.links[it.id].toOpt() }
-                .flatMap { it.find { it.move == m }.toOpt() }
-                .map { (id, _, preText) -> gameStatez.copy(preText = preText, currentLocation = id) }
-                .getOrElse { gameStatez }
+    fun takeAction(gameState: GameState, move: Move): GameState {
+        return gameState.locationOpt()
+                .flatMap { gameState.world.links[it.id].toOpt() }
+                .flatMap { it.find { it.move == move }.toOpt() }
+                .map { (id, _, preText) -> gameState.copy(preText = preText, currentLocation = id) }
+                .getOrElse { gameState }
     }
 
     fun <T> T?.toOpt(): Option<T> {
@@ -22,5 +22,5 @@ class GoNorth {
     }
 }
 
-data class GameStatez(val preText: String, val world: World, val currentLocation: UUID)
+data class GameState(val preText: String, val world: World, val currentLocation: UUID)
 

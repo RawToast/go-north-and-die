@@ -1,14 +1,14 @@
 package gonorth.domain
 
-import gonorth.GameStatez
+import gonorth.GameState
 import kategory.Option
 
-fun GameStatez.location(): Location? {
+fun GameState.location(): Location? {
     return this.world
             .locations
-            .find { l -> l.id == this.currentLocation }
+            .find { (id) -> id == this.currentLocation }
 }
 
-fun GameStatez.locationOpt(): Option<Location> {
+fun GameState.locationOpt(): Option<Location> {
     return Option.fromNullable(this.location())
 }
