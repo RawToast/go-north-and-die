@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import gonorth.GoNorth
 import gonorth.SpikeGameClient
 import gonorth.domain.location
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.application.log
+import io.ktor.application.*
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
@@ -53,7 +50,6 @@ fun Application.module() {
                 val formData = call.receiveParameters()
 
                 val userOpt: Option<String> = formData["user_id"].toOpt()
-                val textOpt: Option<String> = formData["text"].toOpt()
 
                 val sr = userOpt.map { u -> client.startGame(u) }
                         .map { g ->
@@ -65,7 +61,8 @@ fun Application.module() {
 
 
 
-                call.respond(sr.getOrElse { SlackResponse("ERROR: Unable to create game ${textOpt.getOrElse { "N/A" }}") })
+                call.respond(sr
+                        .getOrElse { SlackResponse("Failed to create game") })
             } else {
 
                 log.warn("Invalid request " + call.request.contentType()
@@ -101,7 +98,7 @@ fun Application.module() {
                             }
                         }
 
-                call.respond(sr.getOrElse { SlackResponse("ERROR: Unable to create game ${textOpt.getOrElse { "N/A" }}") })
+                call.respond(sr.getOrElse { SlackResponse("Unprocessable request: ${textOpt.getOrElse { "N/A" }}") })
             } else {
                 log.warn("Invalid request " + call.request.contentType()
                         + " " + call.request.headers.toString())
