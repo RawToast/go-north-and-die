@@ -7,6 +7,14 @@ import java.util.*
 
 class GoNorth {
 
+    fun takeAnyAction(gameState: GameState, move: Move, command: Option<String>): GameState {
+        return if (movementActions.contains(move) && command.isEmpty) {
+            takeAction(gameState, move) x
+        } else if (movementActions.contains(move) && command.nonEmpty()) {
+            takeActionWithTarget(gameState, move, command.getOrElse { "" })
+        } else gameState
+    }
+
     fun takeAction(gameState: GameState, move: Move): GameState {
         return if (movementActions.contains(move)) {
             handleMovement(gameState, move).getOrElse { gameState }

@@ -59,7 +59,6 @@ fun Application.module() {
                                     .map { it.move.name }
                             SlackResponse(g.preText.preText + "\n" +
                                     g.preText.description.map { it + "\n"}.getOrElse { "" } +
-//                                    g.location()?.description + "\n" +
                                     mvs)
                         }
 
@@ -83,7 +82,6 @@ fun Application.module() {
 
                 val userOpt: Option<String> = formData["user_id"].toOpt()
                 val textOpt: Option<String> = formData["text"].toOpt()
-
 
                 val sr = userOpt
                         .flatMap { u ->

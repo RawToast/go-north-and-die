@@ -1,5 +1,7 @@
 package gonorth
 
+import com.fasterxml.jackson.databind.JsonSerializer
+import gonorth.domain.Item
 import gonorth.domain.Location
 import gonorth.domain.Move
 import gonorth.domain.location
@@ -25,12 +27,23 @@ interface GameClient {
 
 class SpikeGameClient(var db: Map<String, GameState>, val engine: GoNorth) : GameClient {
     override fun takeInput(userId: String, input: String): Option<GameState> {
+
+        val moveOpt = input.substringAfter(' ')
+        val command = input.substringBefore(" ")
+
+
+        val commandOpt = if (command == input) {
+            Option.None
+        } else {
+            Option.Some(command)
+        }
+
         val res = db[userId].toOpt()
                 .flatMap { gs ->
                     Move.values()
                             .find { m -> m.name == input }
                             .toOpt()
-                            .map { engine.takeAction(gs, it)  }
+                            .map { engine.takeAnyAction(gs, it, commandOpt)  }
                 }
 
         db = res.fold( {db}, { db.plus(Pair(userId, it)) })
@@ -106,12 +119,14 @@ class TerminalClient(val goNorth: GoNorth) {
 
 object BasicWorld {
     fun generate(): GameState {
+        val key = Item("Key", "Shiny key, looks useful")
+
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
         val p2 = Location(UUID.randomUUID(), "The path comes to an abrupt end.", emptySet())
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
         val p4 = Location(UUID.randomUUID(),
                 "The road continues to the west, whilst a side path heads south.", emptySet())
-        val p5 = Location(UUID.randomUUID(), "A river blocks your path.", emptySet())
+        val p5 = Location(UUID.randomUUID(), "A river blocks your path. A key rests on the ground. ", setOf(key))
         val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
         val p7 = Location(UUID.randomUUID(),
                 "You look at the tower door in front of you. Rocks fall, You die.", emptySet())
