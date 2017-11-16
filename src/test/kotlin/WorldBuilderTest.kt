@@ -1,3 +1,4 @@
+import gonorth.domain.Item
 import gonorth.domain.Location
 import gonorth.world.WorldBuilder
 import org.junit.Test
@@ -12,8 +13,8 @@ class WorldBuilderTest {
     val p2Description = "Other to"
     val p1UUID = UUID.randomUUID()
     val p2UUID = UUID.randomUUID()
-    val p1 = Location(p1UUID, p1Description)
-    val p2 = Location(p2UUID, p2Description)
+    val p1 = Location(p1UUID, p1Description, emptySet())
+    val p2 = Location(p2UUID, p2Description, emptySet())
     val worldBuilder = WorldBuilder().newLocation(p1)
 
     @Test fun linkingPlacesUpdatesBothPlacesLinks() {
@@ -31,7 +32,6 @@ class WorldBuilderTest {
     }
 
     @Test fun placesLinkedToEachOtherAreNavigable() {
-
         val world = worldBuilder.newLocation(p2)
                 .twoWayLink(p1, p2, Move.EAST, Move.WEST,
                         "You go east", "Back").world
@@ -49,6 +49,15 @@ class WorldBuilderTest {
         assertEquals(1, world.links[p2UUID]!!.size)
         assertEquals(p2UUID, world.links[p1UUID]!!.single().to )
         assertEquals(Move.WEST, world.links[p2UUID]!!.single().move)
+    }
+
+    @Test fun canAddAnItem() {
+        val item = Item("TestItem", "Test Description")
+        val world = worldBuilder.placeItem(p1, item).world
+
+        assertTrue(world.locations.size == 1, "Only one location")
+        assertTrue(world.locations.single().items.isNotEmpty(), "Place 1 has an item")
+        assertTrue(world.locations.single().items.contains(item), "Place 1 contains the item placed")
     }
 }
 
