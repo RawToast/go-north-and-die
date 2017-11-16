@@ -21,6 +21,7 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kategory.Option
+import kategory.empty
 import kategory.getOrElse
 
 fun main(args: Array<String>) {
@@ -56,7 +57,10 @@ fun Application.module() {
                             val mvs: List<String> = g.world.links
                                     .getOrDefault(g.currentLocation, emptySet())
                                     .map { it.move.name }
-                            SlackResponse(g.preText + "\n" + g.location()?.description + "\n" + mvs)
+                            SlackResponse(g.preText.preText + "\n" +
+                                    g.preText.description.map { it + "\n"}.getOrElse { "" } +
+//                                    g.location()?.description + "\n" +
+                                    mvs)
                         }
 
 
@@ -92,9 +96,14 @@ fun Application.module() {
                                     .map { it.move.name }
 
                             if (mvs.isEmpty()) {
-                                SlackResponse(g.preText + "\n" + g.location()?.description)
+                                SlackResponse(g.preText.preText + "\n" +
+                                        g.preText.description.map { it + "\n"}.getOrElse { "" } +
+                                        g.location()?.description)
                             } else {
-                                SlackResponse(g.preText + "\n" + g.location()?.description + "\n" + mvs)
+                                SlackResponse(g.preText.preText + "\n" +
+                                        g.preText.description.map { it + "\n"}.getOrElse { "" } +
+                                        g.location()?.description + "\n" +
+                                        mvs)
                             }
                         }
 

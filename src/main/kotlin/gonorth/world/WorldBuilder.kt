@@ -1,18 +1,10 @@
 package gonorth.world
 
-import gonorth.domain.Move
-import gonorth.domain.Links
-import gonorth.domain.Location
-import gonorth.domain.World
+import gonorth.domain.*
+import gonorth.slack.toOpt
 import kategory.getOption
 
 // gonorth.domain.World data structure and building functions
-
-// Basic struct
-data class Place(val description: String, val links: Set<Link>)
-
-data class Link(val place: Place, val move: Move, val description: String)
-
 
 class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
 
@@ -39,5 +31,13 @@ class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
 
         return linkLocation(from, to, move, description)
                 .linkLocation(to, from, returnMove, returnDescription)
+    }
+
+    fun placeItem(at: Location, item: Item): WorldBuilder {
+        val newLocation = world.locations
+                .map { if (it.id == at.id) it.copy(items = it.items.plus(item)) else it }
+                .toSet()
+
+        return WorldBuilder(World(newLocation, world.links))
     }
 }

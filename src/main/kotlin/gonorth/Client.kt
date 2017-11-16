@@ -7,7 +7,6 @@ import gonorth.slack.toOpt
 import gonorth.world.WorldBuilder
 import kategory.Option
 import kategory.getOrElse
-import kategory.nonEmpty
 import java.util.*
 
 fun main(args: Array<String>) {
@@ -74,7 +73,8 @@ class TerminalClient(val goNorth: GoNorth) {
             val resGame: GameState = Move.values()
                     .find { m -> m.name == i }
                     .toOpt()
-                    .fold({ gs.copy(preText = "Invalid input") },
+                    .fold({ gs.copy(preText = GameText("Invalid input",
+                                    Option.Some("It's not possible to go in that direction"))) },
                             { m -> goNorth.takeAction(gs, m) })
 
             outputToTerminal(resGame, output)
@@ -89,7 +89,10 @@ class TerminalClient(val goNorth: GoNorth) {
                 .getOrDefault(gameState.currentLocation, emptySet())
                 .map { it.move.name }
 
-        out(gameState.preText)
+        out(gameState.preText.preText)
+        if(!gameState.preText.description.isEmpty) {
+            out(gameState.preText.description.getOrElse { "" })
+        }
         out(currentLocation.description)
         if (moves.isNotEmpty()) {
             out("Moves: $moves")
@@ -103,13 +106,15 @@ class TerminalClient(val goNorth: GoNorth) {
 
 object BasicWorld {
     fun generate(): GameState {
-        val p1 = Location(UUID.randomUUID(), "There is a fork in the path.")
-        val p2 = Location(UUID.randomUUID(), "The path comes to an abrupt end.")
-        val p3 = Location(UUID.randomUUID(), "You went north and died.")
-        val p4 = Location(UUID.randomUUID(), "The road continues to the west, whilst a side path heads south.")
-        val p5 = Location(UUID.randomUUID(), "A river blocks your path.")
-        val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.")
-        val p7 = Location(UUID.randomUUID(), "You look at the tower door in front of you. Rocks fall, You die.")
+        val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
+        val p2 = Location(UUID.randomUUID(), "The path comes to an abrupt end.", emptySet())
+        val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
+        val p4 = Location(UUID.randomUUID(),
+                "The road continues to the west, whilst a side path heads south.", emptySet())
+        val p5 = Location(UUID.randomUUID(), "A river blocks your path.", emptySet())
+        val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
+        val p7 = Location(UUID.randomUUID(),
+                "You look at the tower door in front of you. Rocks fall, You die.", emptySet())
 
 
 
@@ -136,7 +141,11 @@ object BasicWorld {
                 .linkLocation(p6, p7, Move.NORTH, "You head north towards the tower")
                 .world
 
+        val startingText = GameText(
+                "You find yourself lost in a dark forest.",
+                Option.Some("It might be wise to find shelter for the night.")
+        )
 
-        return GameState("You find yourself lost in a dark forest.", world, p1.id)
+        return GameState(startingText, world, p1.id)
     }
 }
