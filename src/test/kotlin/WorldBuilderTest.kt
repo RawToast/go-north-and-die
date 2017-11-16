@@ -60,9 +60,3 @@ class WorldBuilderTest {
         assertTrue(world.locations.single().items.contains(item), "Place 1 contains the item placed")
     }
 }
-
-object WorldExtensions {
-
-
-
-}

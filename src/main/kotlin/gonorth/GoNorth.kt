@@ -1,11 +1,8 @@
 package gonorth
 
-import gonorth.domain.Item
-import gonorth.domain.Move
-import gonorth.domain.World
-import gonorth.domain.locationOpt
-import kategory.Option
-import kategory.getOrElse
+import gonorth.domain.*
+import kategory.*
+import kategory.Option.*
 import java.util.*
 
 class GoNorth {
@@ -16,26 +13,42 @@ class GoNorth {
         } else gameState
     }
 
-    fun takeActionWithTarget(gameState: GameState, move: Move, target: String): GameState {
+    fun takeActionWithTarget(gameState: GameState, move: Move, target: String): GameState =
+            handleActionWithTarget(move, gameState, target)
+
+    private fun handleActionWithTarget(move: Move, gameState: GameState, target: String): GameState {
         return if (movementActions.contains(move)) {
             handleMovement(gameState, move).getOrElse { gameState }
         } else {
 
-            gameState.locationOpt()
-                    .map { it.items.filter { it.name == target } }
-                    .getOrElse { emptyList() }
-                    .singleOrNull { it.name == target }
-                    .toOpt()
-                    .map { i -> gameState.copy(preText = "You take a closer look.",  = i.description) }
-                    .getOrElse { gameState.copy(preText = "You take a closer look.",  = "There is no $target") }
+            val item = gameState.locationOpt()
+                    .flatMap {
+                        it.items.find { it.name == target }.toOpt()
+                                .map { it.description }
+                    }
+
+            when (item) {
+                is Some -> gameState
+                        .copy(preText = GameText("You take a closer look.", item))
+                is None -> gameState
+                        .copy(preText = GameText("You take a closer look.", Some("There is no $target")))
+            }
         }
     }
 
     private fun handleMovement(gameState: GameState, move: Move): Option<GameState> {
-        return gameState.locationOpt()
+        val location = gameState.locationOpt()
                 .flatMap { gameState.world.links[it.id].toOpt() }
                 .flatMap { it.find { it.move == move }.toOpt() }
-                .map { (id, _, preText) -> gameState.copy(preText = preText, currentLocation = id) }
+
+        val newPlace = location.flatMap { l ->
+            gameState.world.locations.find { it.id == l.to}.toOpt() }
+                .map { it.description }
+
+        return location
+                .map { (id, _, preText) -> gameState.copy(
+                        preText = GameText(preText, newPlace),
+                        currentLocation = id) }
     }
 
     private fun <T> T?.toOpt(): Option<T> = Option.fromNullable(this)
@@ -44,5 +57,7 @@ class GoNorth {
     private val targetActions = listOf(Move.DESCRIBE)
 }
 
-data class GameState(val preText: String, val world: World, val currentLocation: UUID)
+data class GameState(val preText: GameText, val world: World, val currentLocation: UUID)
+
+data class GameText(val preText: String, val description: Option<String>)
 
