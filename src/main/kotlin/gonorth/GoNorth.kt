@@ -9,7 +9,7 @@ class GoNorth {
 
     fun takeAnyAction(gameState: GameState, move: Move, command: Option<String>): GameState {
         return if (movementActions.contains(move) && command.isEmpty) {
-            takeAction(gameState, move) x
+            takeAction(gameState, move)
         } else if (movementActions.contains(move) && command.nonEmpty()) {
             takeActionWithTarget(gameState, move, command.getOrElse { "" })
         } else gameState

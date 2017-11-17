@@ -28,7 +28,7 @@ interface GameClient {
 class SpikeGameClient(var db: Map<String, GameState>, val engine: GoNorth) : GameClient {
     override fun takeInput(userId: String, input: String): Option<GameState> {
 
-        val moveOpt = input.substringAfter(' ')
+        //val moveOpt = input.substringAfter(' ')
         val command = input.substringBefore(" ")
 
 
