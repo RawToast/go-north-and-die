@@ -1,6 +1,5 @@
 package gonorth
 
-import com.fasterxml.jackson.databind.JsonSerializer
 import gonorth.domain.Item
 import gonorth.domain.Location
 import gonorth.domain.Move
@@ -12,7 +11,7 @@ import kategory.getOrElse
 import java.util.*
 
 fun main(args: Array<String>) {
-    val client = TerminalClient(GoNorth())
+    val client = TerminalClient(GoNorth(), SimpleWorldGenerator())
 
     client.startGame()
 }
@@ -25,7 +24,8 @@ interface GameClient {
 
 }
 
-class SpikeGameClient(var db: Map<String, GameState>, val engine: GoNorth) : GameClient {
+
+class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val worldBuilder: gonorth.WorldGenerator) : GameClient {
     override fun takeInput(userId: String, input: String): Option<GameState> {
         // /gnad EAST
         // /gnad DESCRIBE Key
@@ -52,7 +52,7 @@ class SpikeGameClient(var db: Map<String, GameState>, val engine: GoNorth) : Gam
     }
 
     override fun startGame(userId: String): GameState {
-        val gs = BasicWorld.generate()
+        val gs = worldBuilder.generate()
 
         db = db.plus(Pair(userId, gs))
         return gs
@@ -64,10 +64,10 @@ class SpikeGameClient(var db: Map<String, GameState>, val engine: GoNorth) : Gam
  *
  * @param goNorth GoNorth game logic
  */
-class TerminalClient(val goNorth: GoNorth) {
+class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenerator) {
 
     fun startGame() {
-        val gameState = BasicWorld.generate()
+        val gameState = worldBuilder.generate()
 
         val input: () -> String? = { readLine() }
         val output: (String) -> Unit = { it: String -> println(it) }
@@ -117,8 +117,12 @@ class TerminalClient(val goNorth: GoNorth) {
     }
 }
 
-object BasicWorld {
-    fun generate(): GameState {
+interface WorldGenerator {
+    fun generate(): GameState
+}
+
+class SimpleWorldGenerator : gonorth.WorldGenerator {
+    override fun generate(): GameState {
         val key = Item("Key", "Shiny key, looks useful")
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
