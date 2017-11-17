@@ -1,11 +1,10 @@
 package gonorth.slack
 
 import gonorth.GameClient
-import gonorth.domain.location
 import kategory.Option
 import kategory.getOrElse
 
-class SlackService(val client: GameClient) {
+class SlackService(private val client: GameClient) {
 
     fun createGame(user: Option<String>): Option<SlackResponse> {
         return user.map { u -> client.startGame(u) }
@@ -32,12 +31,10 @@ class SlackService(val client: GameClient) {
 
                     if (mvs.isEmpty()) {
                         SlackResponse(g.preText.preText + "\n" +
-                                g.preText.description.map { it + "\n" }.getOrElse { "" } +
-                                g.location()?.description)
+                                g.preText.description.map { it + "\n" }.getOrElse { "" })
                     } else {
                         SlackResponse(g.preText.preText + "\n" +
                                 g.preText.description.map { it + "\n" }.getOrElse { "" } +
-                                g.location()?.description + "\n" +
                                 mvs)
                     }
                 }
