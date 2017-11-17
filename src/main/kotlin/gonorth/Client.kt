@@ -27,12 +27,12 @@ interface GameClient {
 
 class SpikeGameClient(var db: Map<String, GameState>, val engine: GoNorth) : GameClient {
     override fun takeInput(userId: String, input: String): Option<GameState> {
-
-        //val moveOpt = input.substringAfter(' ')
+        // /gnad EAST
+        // /gnad DESCRIBE Key
+        val moveOpt = input.substringAfter(' ')
         val command = input.substringBefore(" ")
 
-
-        val commandOpt = if (command == input) {
+        val commandOpt = if (command == moveOpt) {
             Option.None
         } else {
             Option.Some(command)
@@ -41,7 +41,7 @@ class SpikeGameClient(var db: Map<String, GameState>, val engine: GoNorth) : Gam
         val res = db[userId].toOpt()
                 .flatMap { gs ->
                     Move.values()
-                            .find { m -> m.name == input }
+                            .find { m -> m.name == moveOpt }
                             .toOpt()
                             .map { engine.takeAnyAction(gs, it, commandOpt)  }
                 }
