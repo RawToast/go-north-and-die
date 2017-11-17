@@ -28,7 +28,7 @@ class SimpleGameClientTest {
 
     @Test
     fun takeInputShouldMoveThePlayerWhenGivenAValidDirection() {
-        val user = "Jones"
+        val user = "Davey"
         val textOpt = "NORTH"
         val createdGame: GameState = gameClient.startGame(user)
         val resultOpt: Option<GameState> = gameClient.takeInput(user, textOpt)
