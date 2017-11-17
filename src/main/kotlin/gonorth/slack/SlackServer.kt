@@ -2,9 +2,12 @@ package gonorth.slack
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import gonorth.GoNorth
-import gonorth.SpikeGameClient
-import gonorth.domain.location
-import io.ktor.application.*
+import gonorth.SimpleGameClient
+import gonorth.SimpleWorldGenerator
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.application.log
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
@@ -21,7 +24,6 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kategory.Option
-import kategory.empty
 import kategory.getOrElse
 
 fun main(args: Array<String>) {
@@ -31,7 +33,9 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
 
-    val client = SpikeGameClient(kotlin.collections.mapOf(), GoNorth())
+    val client = SimpleGameClient(kotlin.collections.mapOf(), GoNorth(), SimpleWorldGenerator())
+
+    val slackService = SlackService(client)
 
     install(DefaultHeaders)
     install(CallLogging)
@@ -41,29 +45,17 @@ fun Application.module() {
         }
     }
     routing {
-        get("/") {
+        get("/health") {
             call.respondText("Hello, world!", ContentType.Text.Html)
         }
         post("create") {
             log.info("Request made to create endpoint")
-
             if (call.request.contentType() == ContentType.Application.FormUrlEncoded) {
                 val formData = call.receiveParameters()
 
                 val userOpt: Option<String> = formData["user_id"].toOpt()
 
-                val sr = userOpt.map { u -> client.startGame(u) }
-                        .map { g ->
-                            val mvs: List<String> = g.world.links
-                                    .getOrDefault(g.currentLocation, emptySet())
-                                    .map { it.move.name }
-                            SlackResponse(g.preText.preText + "\n" +
-                                    g.preText.description.map { it + "\n"}.getOrElse { "" } +
-//                                    g.location()?.description + "\n" +
-                                    mvs)
-                        }
-
-
+                val sr = slackService.createGame(userOpt)
 
                 call.respond(sr
                         .getOrElse { SlackResponse("Failed to create game") })
@@ -84,28 +76,7 @@ fun Application.module() {
                 val userOpt: Option<String> = formData["user_id"].toOpt()
                 val textOpt: Option<String> = formData["text"].toOpt()
 
-
-                val sr = userOpt
-                        .flatMap { u ->
-                            textOpt.flatMap { t -> client.takeInput(u, t) }
-                        }
-                        .map { g ->
-
-                            val mvs: List<String> = g.world.links
-                                    .getOrDefault(g.currentLocation, emptySet())
-                                    .map { it.move.name }
-
-                            if (mvs.isEmpty()) {
-                                SlackResponse(g.preText.preText + "\n" +
-                                        g.preText.description.map { it + "\n"}.getOrElse { "" } +
-                                        g.location()?.description)
-                            } else {
-                                SlackResponse(g.preText.preText + "\n" +
-                                        g.preText.description.map { it + "\n"}.getOrElse { "" } +
-                                        g.location()?.description + "\n" +
-                                        mvs)
-                            }
-                        }
+                val sr = slackService.takeInput(userOpt, textOpt)
 
                 call.respond(sr.getOrElse { SlackResponse("Unprocessable request: ${textOpt.getOrElse { "N/A" }}") })
             } else {

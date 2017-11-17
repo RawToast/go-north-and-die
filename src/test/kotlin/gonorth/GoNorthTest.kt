@@ -1,16 +1,16 @@
 package gonorth
 
 import gonorth.domain.Item
-import gonorth.domain.Move.*
-import gonorth.world.WorldBuilder
-
 import gonorth.domain.Location
+import gonorth.domain.Move.*
+import gonorth.domain.location
+import gonorth.world.WorldBuilder
+import kategory.Option
+import kategory.getOrElse
+import kategory.some
 import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
-import gonorth.domain.location
-import kategory.Option
-import kategory.getOrElse
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -83,6 +83,20 @@ class GoNorthTest {
                 .world
         val testGameState = gameState.copy(world = testWorld)
         val newState = goNorth.takeActionWithTarget(testGameState, DESCRIBE, "Fox")
+
+        assertEquals("You take a closer look.", newState.preText.preText)
+
+        assertEquals("There is no Fox", newState.preText.description.getOrElse { "" })
+        assertTrue(newState.world.links.containsKey(newState.location()?.id))
+    }
+
+    @Test
+    fun canDescribeATargetUsingTheHelperMethod() {
+        val testWorld = builder
+                .placeItem(location1, Item("Key", "It's a shiny golden key."))
+                .world
+        val testGameState = gameState.copy(world = testWorld)
+        val newState = goNorth.takeAnyAction(testGameState, DESCRIBE, "Fox".some())
 
         assertEquals("You take a closer look.", newState.preText.preText)
 

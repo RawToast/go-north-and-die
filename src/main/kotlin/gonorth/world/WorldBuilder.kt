@@ -1,7 +1,6 @@
 package gonorth.world
 
 import gonorth.domain.*
-import gonorth.slack.toOpt
 import kategory.getOption
 
 // gonorth.domain.World data structure and building functions
