@@ -1,17 +1,16 @@
 package gonorth
 
 import gonorth.domain.Item
-import gonorth.domain.Move.*
-import gonorth.world.WorldBuilder
-
 import gonorth.domain.Location
-import org.junit.Test
-import java.util.*
-import kotlin.test.assertEquals
+import gonorth.domain.Move.*
 import gonorth.domain.location
+import gonorth.world.WorldBuilder
 import kategory.Option
 import kategory.getOrElse
 import kategory.some
+import org.junit.Test
+import java.util.*
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

@@ -1,14 +1,18 @@
 package gonorth
 
-import gonorth.domain.*
-import kategory.*
-import kategory.Option.*
+import gonorth.domain.Move
+import gonorth.domain.World
+import gonorth.domain.locationOpt
+import kategory.Option
+import kategory.Option.None
+import kategory.Option.Some
+import kategory.getOrElse
+import kategory.nonEmpty
 import java.util.*
 
 class GoNorth {
 
     fun takeAnyAction(gameState: GameState, move: Move, command: Option<String>): GameState {
-        println("Taking action $move ${command.getOrElse { "" }}")
         return if (movementActions.contains(move)) {
             takeAction(gameState, move)
         } else if (command.nonEmpty()) {

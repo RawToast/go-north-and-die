@@ -1,11 +1,11 @@
 import gonorth.domain.Item
 import gonorth.domain.Location
+import gonorth.domain.Move
 import gonorth.world.WorldBuilder
 import org.junit.Test
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import gonorth.domain.Move
-import java.util.*
 
 class WorldBuilderTest {
 

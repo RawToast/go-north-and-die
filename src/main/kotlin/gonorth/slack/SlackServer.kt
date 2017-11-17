@@ -1,18 +1,19 @@
 package gonorth.slack
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import gonorth.SimpleWorldGenerator
 import gonorth.GoNorth
 import gonorth.SimpleGameClient
-import gonorth.domain.location
-import io.ktor.application.*
+import gonorth.SimpleWorldGenerator
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.application.log
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.jackson.jackson
-import io.ktor.pipeline.PipelineContext
 import io.ktor.request.contentType
 import io.ktor.request.receiveParameters
 import io.ktor.response.respond
@@ -23,7 +24,6 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kategory.Option
-import kategory.empty
 import kategory.getOrElse
 
 fun main(args: Array<String>) {
@@ -45,11 +45,11 @@ fun Application.module() {
         }
     }
     routing {
-        get("/") {
+        get("/health") {
             call.respondText("Hello, world!", ContentType.Text.Html)
         }
         post("create") {
-
+            log.info("Request made to create endpoint")
             if (call.request.contentType() == ContentType.Application.FormUrlEncoded) {
                 val formData = call.receiveParameters()
 
@@ -85,8 +85,6 @@ fun Application.module() {
                 call.respond(HttpStatusCode.BadRequest)
             }
         }
-
-
     }
 }
 
