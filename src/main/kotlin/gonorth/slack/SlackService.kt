@@ -1,6 +1,7 @@
 package gonorth.slack
 
 import gonorth.GameClient
+import gonorth.domain.locationOpt
 import kategory.Option
 import kategory.getOrElse
 
@@ -14,6 +15,7 @@ class SlackService(private val client: GameClient) {
                             .map { it.move.name }
                     SlackResponse(g.preText.preText + "\n" +
                             g.preText.description.map { it + "\n" }.getOrElse { "" } +
+                            g.locationOpt().map { it.description.plus("\n")}.getOrElse {""} +
                             mvs)
                 }
     }

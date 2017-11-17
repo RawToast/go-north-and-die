@@ -8,9 +8,10 @@ import java.util.*
 class GoNorth {
 
     fun takeAnyAction(gameState: GameState, move: Move, command: Option<String>): GameState {
-        return if (movementActions.contains(move) && command.isEmpty) {
+        println("Taking action $move ${command.getOrElse { "" }}")
+        return if (movementActions.contains(move)) {
             takeAction(gameState, move)
-        } else if (movementActions.contains(move) && command.nonEmpty()) {
+        } else if (command.nonEmpty()) {
             takeActionWithTarget(gameState, move, command.getOrElse { "" })
         } else gameState
     }

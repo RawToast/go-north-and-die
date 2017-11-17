@@ -29,19 +29,20 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val 
     override fun takeInput(userId: String, input: String): Option<GameState> {
         // /gnad EAST
         // /gnad DESCRIBE Key
-        val moveOpt = input.substringAfter(' ')
-        val command = input.substringBefore(" ")
+        val moveStr = input.substringBefore(' ')
+        val command = input.substringAfter(" ")
 
-        val commandOpt = if (command == moveOpt) {
+        val commandOpt = if (command == moveStr) {
             Option.None
         } else {
             Option.Some(command)
         }
 
+
         val res = db[userId].toOpt()
                 .flatMap { gs ->
                     Move.values()
-                            .find { m -> m.name == moveOpt }
+                            .find { m -> m.name == moveStr }
                             .toOpt()
                             .map { engine.takeAnyAction(gs, it, commandOpt)  }
                 }
@@ -158,6 +159,28 @@ class SimpleWorldGenerator : gonorth.WorldGenerator {
                         "As you head west, you ponder whether println can print strings")
                 .linkLocation(p1, p3, Move.NORTH, "You stumble ahead")
                 .linkLocation(p6, p7, Move.NORTH, "You head north towards the tower")
+                .world
+
+        val startingText = GameText(
+                "You find yourself lost in a dark forest.",
+                Option.Some("It might be wise to find shelter for the night.")
+        )
+
+        return GameState(startingText, world, p1.id)
+    }
+}
+
+class TinyWorldGenerator : gonorth.WorldGenerator {
+    override fun generate(): GameState {
+        val key = Item("Key", "Shiny key, looks useful")
+
+        val p1 = Location(UUID.randomUUID(), "There is a fork in the path. A key rests on the ground", setOf(key))
+        val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
+
+
+        val world = WorldBuilder().newLocation(p1)
+                .newLocation(p3)
+                .linkLocation(p1, p3, Move.NORTH, "You stumble ahead")
                 .world
 
         val startingText = GameText(
