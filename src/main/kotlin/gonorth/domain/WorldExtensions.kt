@@ -1,6 +1,5 @@
 package gonorth.domain
 
-import gonorth.GameState
 import kategory.Option
 
 fun GameState.location(): Location? {

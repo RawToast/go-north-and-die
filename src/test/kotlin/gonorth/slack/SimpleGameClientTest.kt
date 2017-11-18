@@ -1,6 +1,7 @@
 package gonorth.slack
 
 import gonorth.*
+import gonorth.domain.GameState
 import gonorth.domain.Move
 import gonorth.domain.location
 import kategory.Option
@@ -15,15 +16,15 @@ import kotlin.test.assertTrue
 class SimpleGameClientTest {
 
     val goNorth = GoNorth()
-    val gameClient: GameClient = SimpleGameClient(emptyMap(), goNorth, TinyWorldGenerator())
+    val gameClient: GameClient = SimpleGameClient(emptyMap(), goNorth, TinyGameStateGenerator())
 
     @Test
     fun createShouldCreateANewGameWhenGivenValidInput() {
         val user = "Dave"
         val gameStateOption: GameState = gameClient.startGame(user)
 
-        assertTrue { gameStateOption.preText.preText.isNotEmpty() }
-        assertTrue { gameStateOption.preText.description.nonEmpty() }
+        assertTrue { gameStateOption.gameText.preText.isNotEmpty() }
+        assertTrue { gameStateOption.gameText.description.nonEmpty() }
     }
 
     @Test
@@ -37,8 +38,8 @@ class SimpleGameClientTest {
         assertTrue { resultOpt.nonEmpty() }
         assertNotEquals(createdGame, result)
 
-        val initialText = createdGame.preText
-        val resultText = result.preText
+        val initialText = createdGame.gameText
+        val resultText = result.gameText
 
         assertTrue(resultText.preText.isNotEmpty())
         assertNotEquals(initialText.preText, resultText.preText)
@@ -60,8 +61,8 @@ class SimpleGameClientTest {
         assertTrue { resultOpt.nonEmpty() }
         assertNotEquals(createdGame, result)
 
-        val initialText = createdGame.preText
-        val resultText = result.preText
+        val initialText = createdGame.gameText
+        val resultText = result.gameText
 
         assertTrue(resultText.preText.isNotEmpty())
         assertNotEquals(initialText.preText, resultText.preText)

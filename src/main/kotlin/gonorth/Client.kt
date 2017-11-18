@@ -1,9 +1,6 @@
 package gonorth
 
-import gonorth.domain.Item
-import gonorth.domain.Location
-import gonorth.domain.Move
-import gonorth.domain.location
+import gonorth.domain.*
 import gonorth.slack.toOpt
 import gonorth.world.WorldBuilder
 import kategory.Option
@@ -11,7 +8,7 @@ import kategory.getOrElse
 import java.util.*
 
 fun main(args: Array<String>) {
-    val client = TerminalClient(GoNorth(), SimpleWorldGenerator())
+    val client = TerminalClient(GoNorth(), SimpleGameStateGenerator())
 
     client.startGame()
 }
@@ -25,7 +22,7 @@ interface GameClient {
 }
 
 
-class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val worldBuilder: gonorth.WorldGenerator) : GameClient {
+class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val worldBuilder: gonorth.GameStateGenerator) : GameClient {
     override fun takeInput(userId: String, input: String): Option<GameState> {
         // /gnad EAST
         // /gnad DESCRIBE Key
@@ -53,7 +50,11 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val 
     }
 
     override fun startGame(userId: String): GameState {
-        val gs = worldBuilder.generate()
+
+        val r = Random(System.currentTimeMillis()).nextLong()
+        val player = Player(1000, emptySet(), alive = true)
+
+        val gs = worldBuilder.generate(player, r)
 
         db = db.plus(Pair(userId, gs))
         return gs
@@ -65,10 +66,14 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val 
  *
  * @param goNorth GoNorth game logic
  */
-class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenerator) {
+class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.GameStateGenerator) {
 
     fun startGame() {
-        val gameState = worldBuilder.generate()
+        val player = Player(1000, emptySet(), alive = true)
+
+        val r = Random(System.currentTimeMillis()).nextLong()
+
+        val gameState = worldBuilder.generate(player, r)
 
         val input: () -> String? = { readLine() }
         val output: (String) -> Unit = { it: String -> println(it) }
@@ -87,8 +92,8 @@ class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenera
             val resGame: GameState = Move.values()
                     .find { m -> m.name == i }
                     .toOpt()
-                    .fold({ gs.copy(preText = GameText("Invalid input",
-                                    Option.Some("It's not possible to go in that direction"))) },
+                    .fold({ gs.copy(gameText = GameText("Invalid input",
+                            Option.Some("It's not possible to go in that direction"))) },
                             { m -> goNorth.takeAction(gs, m) })
 
             outputToTerminal(resGame, output)
@@ -103,9 +108,9 @@ class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenera
                 .getOrDefault(gameState.currentLocation, emptySet())
                 .map { it.move.name }
 
-        out(gameState.preText.preText)
-        if(!gameState.preText.description.isEmpty) {
-            out(gameState.preText.description.getOrElse { "" })
+        out(gameState.gameText.preText)
+        if(!gameState.gameText.description.isEmpty) {
+            out(gameState.gameText.description.getOrElse { "" })
         }
         out(currentLocation.description)
         if (moves.isNotEmpty()) {
@@ -118,12 +123,12 @@ class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenera
     }
 }
 
-interface WorldGenerator {
-    fun generate(): GameState
+interface GameStateGenerator {
+    fun generate(player: Player, seed: Long): GameState
 }
 
-class SimpleWorldGenerator : gonorth.WorldGenerator {
-    override fun generate(): GameState {
+class SimpleGameStateGenerator : gonorth.GameStateGenerator {
+    override fun generate(player: Player, seed:Long): GameState {
         val key = Item("Key", "Shiny key, looks useful")
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
@@ -166,12 +171,12 @@ class SimpleWorldGenerator : gonorth.WorldGenerator {
                 Option.Some("It might be wise to find shelter for the night.")
         )
 
-        return GameState(startingText, world, p1.id)
+        return GameState(startingText, world, p1.id, player, seed)
     }
 }
 
-class TinyWorldGenerator : gonorth.WorldGenerator {
-    override fun generate(): GameState {
+class TinyGameStateGenerator : gonorth.GameStateGenerator {
+    override fun generate(player: Player, seed: Long): GameState {
         val key = Item("Key", "Shiny key, looks useful")
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path. A key rests on the ground", setOf(key))
@@ -188,6 +193,6 @@ class TinyWorldGenerator : gonorth.WorldGenerator {
                 Option.Some("It might be wise to find shelter for the night.")
         )
 
-        return GameState(startingText, world, p1.id)
+        return GameState(startingText, world, p1.id, player, seed)
     }
 }
