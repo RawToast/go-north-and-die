@@ -8,6 +8,5 @@ fun GameState.location(): Location? {
             .find { (id) -> id == this.currentLocation }
 }
 
-fun GameState.locationOpt(): Option<Location> {
-    return Option.fromNullable(this.location())
-}
+fun GameState.locationOpt(): Option<Location> =
+        Option.fromNullable(this.location())

@@ -3,6 +3,7 @@ package gonorth.slack
 import gonorth.*
 import gonorth.domain.GameState
 import gonorth.domain.Move
+import gonorth.domain.TinyGameStateGenerator
 import gonorth.domain.location
 import kategory.Option
 import kategory.getOrElse

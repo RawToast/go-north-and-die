@@ -3,7 +3,7 @@ package gonorth.slack
 import com.fasterxml.jackson.databind.SerializationFeature
 import gonorth.GoNorth
 import gonorth.SimpleGameClient
-import gonorth.SimpleGameStateGenerator
+import gonorth.domain.SimpleGameStateGenerator
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
