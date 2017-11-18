@@ -13,8 +13,8 @@ class SlackService(private val client: GameClient) {
                     val mvs: List<String> = g.world.links
                             .getOrDefault(g.currentLocation, emptySet())
                             .map { it.move.name }
-                    SlackResponse(g.preText.preText + "\n" +
-                            g.preText.description.map { it + "\n" }.getOrElse { "" } +
+                    SlackResponse(g.gameText.preText + "\n" +
+                            g.gameText.description.map { it + "\n" }.getOrElse { "" } +
                             g.locationOpt().map { it.description.plus("\n")}.getOrElse {""} +
                             mvs)
                 }
@@ -32,11 +32,11 @@ class SlackService(private val client: GameClient) {
                             .map { it.move.name }
 
                     if (mvs.isEmpty()) {
-                        SlackResponse(g.preText.preText + "\n" +
-                                g.preText.description.map { it + "\n" }.getOrElse { "" })
+                        SlackResponse(g.gameText.preText + "\n" +
+                                g.gameText.description.map { it + "\n" }.getOrElse { "" })
                     } else {
-                        SlackResponse(g.preText.preText + "\n" +
-                                g.preText.description.map { it + "\n" }.getOrElse { "" } +
+                        SlackResponse(g.gameText.preText + "\n" +
+                                g.gameText.description.map { it + "\n" }.getOrElse { "" } +
                                 mvs)
                     }
                 }

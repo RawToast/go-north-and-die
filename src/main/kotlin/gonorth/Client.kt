@@ -1,17 +1,13 @@
 package gonorth
 
-import gonorth.domain.Item
-import gonorth.domain.Location
-import gonorth.domain.Move
-import gonorth.domain.location
+import gonorth.domain.*
 import gonorth.slack.toOpt
-import gonorth.world.WorldBuilder
 import kategory.Option
 import kategory.getOrElse
 import java.util.*
 
 fun main(args: Array<String>) {
-    val client = TerminalClient(GoNorth(), SimpleWorldGenerator())
+    val client = TerminalClient(GoNorth(), SimpleGameStateGenerator())
 
     client.startGame()
 }
@@ -25,7 +21,7 @@ interface GameClient {
 }
 
 
-class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val worldBuilder: gonorth.WorldGenerator) : GameClient {
+class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val worldBuilder: GameStateGenerator) : GameClient {
     override fun takeInput(userId: String, input: String): Option<GameState> {
         // /gnad EAST
         // /gnad DESCRIBE Key
@@ -53,7 +49,11 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val 
     }
 
     override fun startGame(userId: String): GameState {
-        val gs = worldBuilder.generate()
+
+        val r = Random(System.currentTimeMillis()).nextLong()
+        val player = Player(1000, emptySet(), alive = true)
+
+        val gs = worldBuilder.generate(player, r)
 
         db = db.plus(Pair(userId, gs))
         return gs
@@ -65,10 +65,14 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val 
  *
  * @param goNorth GoNorth game logic
  */
-class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenerator) {
+class TerminalClient(val goNorth: GoNorth, val worldBuilder: GameStateGenerator) {
 
     fun startGame() {
-        val gameState = worldBuilder.generate()
+        val player = Player(1000, emptySet(), alive = true)
+
+        val r = Random(System.currentTimeMillis()).nextLong()
+
+        val gameState = worldBuilder.generate(player, r)
 
         val input: () -> String? = { readLine() }
         val output: (String) -> Unit = { it: String -> println(it) }
@@ -87,8 +91,8 @@ class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenera
             val resGame: GameState = Move.values()
                     .find { m -> m.name == i }
                     .toOpt()
-                    .fold({ gs.copy(preText = GameText("Invalid input",
-                                    Option.Some("It's not possible to go in that direction"))) },
+                    .fold({ gs.copy(gameText = GameText("Invalid input",
+                            Option.Some("It's not possible to go in that direction"))) },
                             { m -> goNorth.takeAction(gs, m) })
 
             outputToTerminal(resGame, output)
@@ -103,9 +107,9 @@ class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenera
                 .getOrDefault(gameState.currentLocation, emptySet())
                 .map { it.move.name }
 
-        out(gameState.preText.preText)
-        if(!gameState.preText.description.isEmpty) {
-            out(gameState.preText.description.getOrElse { "" })
+        out(gameState.gameText.preText)
+        if(!gameState.gameText.description.isEmpty) {
+            out(gameState.gameText.description.getOrElse { "" })
         }
         out(currentLocation.description)
         if (moves.isNotEmpty()) {
@@ -118,76 +122,3 @@ class TerminalClient(val goNorth: GoNorth, val worldBuilder: gonorth.WorldGenera
     }
 }
 
-interface WorldGenerator {
-    fun generate(): GameState
-}
-
-class SimpleWorldGenerator : gonorth.WorldGenerator {
-    override fun generate(): GameState {
-        val key = Item("Key", "Shiny key, looks useful")
-
-        val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
-        val p2 = Location(UUID.randomUUID(), "The path comes to an abrupt end.", emptySet())
-        val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
-        val p4 = Location(UUID.randomUUID(),
-                "The road continues to the west, whilst a side path heads south.", emptySet())
-        val p5 = Location(UUID.randomUUID(), "A river blocks your path. A key rests on the ground. ", setOf(key))
-        val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
-        val p7 = Location(UUID.randomUUID(),
-                "You look at the tower door in front of you. Rocks fall, You die.", emptySet())
-
-
-
-        val world = WorldBuilder().newLocation(p1)
-                .newLocation(p2)
-                .newLocation(p3)
-                .newLocation(p4)
-                .newLocation(p5)
-                .newLocation(p6)
-                .newLocation(p7)
-                .twoWayLink(p1, p2, Move.EAST, Move.WEST,
-                        "You take the path heading east",
-                        "You make your way back to the crossroads")
-                .twoWayLink(p1, p4, Move.WEST, Move.EAST,
-                        "You take the path heading west",
-                        "You make your way back to the crossroads")
-                .twoWayLink(p4, p5, Move.SOUTH, Move.NORTH,
-                        "You take the beaten path south",
-                        "You take the worn path north")
-                .twoWayLink(p4, p6, Move.WEST, Move.EAST,
-                        "You continue along the western trail",
-                        "As you head west, you ponder whether println can print strings")
-                .linkLocation(p1, p3, Move.NORTH, "You stumble ahead")
-                .linkLocation(p6, p7, Move.NORTH, "You head north towards the tower")
-                .world
-
-        val startingText = GameText(
-                "You find yourself lost in a dark forest.",
-                Option.Some("It might be wise to find shelter for the night.")
-        )
-
-        return GameState(startingText, world, p1.id)
-    }
-}
-
-class TinyWorldGenerator : gonorth.WorldGenerator {
-    override fun generate(): GameState {
-        val key = Item("Key", "Shiny key, looks useful")
-
-        val p1 = Location(UUID.randomUUID(), "There is a fork in the path. A key rests on the ground", setOf(key))
-        val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
-
-
-        val world = WorldBuilder().newLocation(p1)
-                .newLocation(p3)
-                .linkLocation(p1, p3, Move.NORTH, "You stumble ahead")
-                .world
-
-        val startingText = GameText(
-                "You find yourself lost in a dark forest.",
-                Option.Some("It might be wise to find shelter for the night.")
-        )
-
-        return GameState(startingText, world, p1.id)
-    }
-}
