@@ -40,7 +40,7 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val 
                     Move.values()
                             .find { m -> m.name == moveStr }
                             .toOpt()
-                            .map { engine.takeAnyAction(gs, it, commandOpt)  }
+                            .map { engine.takeAction(gs, it, commandOpt)  }
                 }
 
         db = res.fold( {db}, { db.plus(Pair(userId, it)) })
@@ -93,7 +93,7 @@ class TerminalClient(val goNorth: GoNorth, val worldBuilder: GameStateGenerator)
                     .toOpt()
                     .fold({ gs.copy(gameText = GameText("Invalid input",
                             Option.Some("It's not possible to go in that direction"))) },
-                            { m -> goNorth.takeAction(gs, m) })
+                            { m -> goNorth.takeAction(gs, m, Option.None) })
 
             outputToTerminal(resGame, output)
 

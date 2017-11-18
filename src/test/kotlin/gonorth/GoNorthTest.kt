@@ -2,37 +2,18 @@ package gonorth
 
 import gonorth.domain.*
 import gonorth.domain.Move.*
-import gonorth.world.WorldBuilder
 import kategory.Option
 import kategory.getOrElse
 import kategory.some
 import org.junit.Test
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class GoNorthTest {
-    val goNorth = GoNorth()
+    private val goNorth = GoNorth()
 
-    val location1 = Location(UUID.randomUUID(), "Starting to", emptySet())
-    val location2 = Location(UUID.randomUUID(), "You went north and died", emptySet())
-    val location3 = Location(UUID.randomUUID(), "and won!", emptySet())
-
-    val builder = WorldBuilder().newLocation(location1)
-            .newLocation(location2)
-            .newLocation(location3)
-            .linkLocation(location1, location2, NORTH, "You stumble ahead")
-            .twoWayLink(location1, location3,
-                    EAST, WEST, "You head east...", "You stroll west")
-
-    val world = builder.world
-
-    val gameText = GameText("You venture into a dark dungeon",
-            Option.None)
-    val player = Player(1000, emptySet(), alive = true)
-
-    val gameState = GameState(gameText, world, location1.id, player, 1234567890L)
+    private val gameState = TestConstants.gameState
 
     @Test
     fun thePlayerStartsAtTheStartingPlace() {
@@ -42,7 +23,7 @@ class GoNorthTest {
 
     @Test
     fun whenGivenNorthThePlayerDies() {
-        val newState = goNorth.takeAction(gameState, NORTH)
+        val newState = goNorth.takeAction(gameState, NORTH, Option.None)
 
         assertEquals("You stumble ahead", newState.gameText.preText)
         assertTrue(newState.location()?.description.orEmpty().contains("You went north and died"))
@@ -52,7 +33,7 @@ class GoNorthTest {
 
     @Test
     fun whenGivenEastThePlayerWins() {
-        val newState = goNorth.takeAction(gameState, EAST)
+        val newState = goNorth.takeAction(gameState, EAST, Option.None)
 
         assertEquals("You head east...", newState.gameText.preText)
 
@@ -63,12 +44,16 @@ class GoNorthTest {
     }
 
     @Test
+    fun whenGivenAMovementAnyCommandsAreIgnored() {
+        val newState = goNorth.takeAction(gameState, EAST, Option.None)
+        val newStateAfterCommand = goNorth.takeAction(gameState, EAST, "Dance".some())
+
+        assertEquals(newState, newStateAfterCommand)
+    }
+
+    @Test
     fun canDescribeATarget() {
-        val testWorld = builder
-                .placeItem(location1, Item("Key", "It's a shiny golden key."))
-                .world
-        val testGameState = gameState.copy(world = testWorld)
-        val newState = goNorth.takeActionWithTarget(testGameState, DESCRIBE,"Key")
+        val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE,"Key".some())
 
         assertEquals("You take a closer look.", newState.gameText.preText)
 
@@ -78,11 +63,7 @@ class GoNorthTest {
 
     @Test
     fun canDescribeATargetThatDoesntExist() {
-        val testWorld = builder
-                .placeItem(location1, Item("Key", "It's a shiny golden key."))
-                .world
-        val testGameState = gameState.copy(world = testWorld)
-        val newState = goNorth.takeActionWithTarget(testGameState, DESCRIBE, "Fox")
+        val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE, "Fox".some())
 
         assertEquals("You take a closer look.", newState.gameText.preText)
 
@@ -92,11 +73,7 @@ class GoNorthTest {
 
     @Test
     fun canDescribeATargetUsingTheHelperMethod() {
-        val testWorld = builder
-                .placeItem(location1, Item("Key", "It's a shiny golden key."))
-                .world
-        val testGameState = gameState.copy(world = testWorld)
-        val newState = goNorth.takeAnyAction(testGameState, DESCRIBE, "Fox".some())
+        val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE, "Fox".some())
 
         assertEquals("You take a closer look.", newState.gameText.preText)
 
