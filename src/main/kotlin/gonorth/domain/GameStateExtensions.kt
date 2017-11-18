@@ -18,4 +18,14 @@ fun GameState.fetchLinks(uuid: UUID): Option<Set<Link>> =
 fun GameState.findLocation(uuid: UUID): Option<Location> =
         this.world.locations.find { it.id == uuid}.toOpt()
 
+fun GameState.findItem(target: String): Option<Item> =
+        this.locationOpt().flatMap { it.items.find { it.name == target }.toOpt()}
+
+
+fun GameState.removeItem(target: String): GameState =
+        this.copy(world = this.world.copy(locations =
+            this.world.locations.map {
+                it.copy(items = it.items.filterNot { it.name == target }.toSet())}
+                    .toSet()))
+
 private fun <T> T?.toOpt(): Option<T> = Option.fromNullable(this)

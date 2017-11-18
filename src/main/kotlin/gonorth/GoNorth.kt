@@ -17,9 +17,9 @@ class GoNorth {
         Move.SOUTH -> handleMovement(gameState, move).getOrElse { gameState }
         Move.WEST -> handleMovement(gameState, move).getOrElse { gameState }
         Move.DESCRIBE -> describe(gameState, target)
-        Move.TAKE -> gameState//TODO()
-        Move.USE -> gameState//TODO()
-        Move.EAT -> gameState//TODO()
+        Move.TAKE -> take(gameState, target)
+        Move.USE -> use(gameState, target)
+        Move.EAT -> eat(gameState, target)
     }
 
     private fun handleMovement(gameState: GameState, move: Move): Option<GameState> {
@@ -38,15 +38,28 @@ class GoNorth {
     }
 
     private fun describe(gameState: GameState, target: String): GameState {
-        val item = gameState.locationOpt()
-                .flatMap {
-                    it.items.find { it.name == target }.toOpt()
+        val item = gameState.findItem(target)
                             .map { it.description }
-                }
-                .getOrElse { "There is no $target" }
-                .some()
+                            .getOrElse { "There is no $target" }
+                            .some()
 
         return gameState.copy(gameText = GameText("You take a closer look.", item))
+    }
+
+    private fun take(gameState: GameState, target: String): GameState {
+
+        val item = gameState.findItem(target)
+        val gameStateWithoutItem = gameState.removeItem(target)
+
+        return gameStateWithoutItem
+    }
+
+    private fun use(gameState: GameState, target: String): GameState {
+        return gameState
+    }
+
+    private fun eat(gameState: GameState, target: String): GameState {
+        return gameState
     }
 
     private fun <T> T?.toOpt(): Option<T> = Option.fromNullable(this)
