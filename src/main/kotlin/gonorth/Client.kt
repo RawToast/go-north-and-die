@@ -15,7 +15,9 @@ interface GameClient {
 }
 
 
-class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth, val worldBuilder: GameStateGenerator) : GameClient {
+class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth,
+                       val worldBuilder: GameStateGenerator) : GameClient {
+
     override fun takeInput(userId: String, input: String): Option<GameState> {
         // /gnad EAST
         // /gnad DESCRIBE Key

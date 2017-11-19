@@ -16,6 +16,9 @@ class SlackService(private val client: GameClient) {
                     SlackResponse(g.gameText.preText + "\n" +
                             g.gameText.description.map { it + "\n" }.getOrElse { "" } +
                             g.locationOpt().map { it.description.plus("\n")}.getOrElse {""} +
+                            g.locationOpt().map { it.items
+                                    .map { it.name }.fold("", {a, b -> a + "\n" + b}) }
+                                    .getOrElse { "" } +
                             mvs)
                 }
     }
@@ -33,10 +36,16 @@ class SlackService(private val client: GameClient) {
 
                     if (mvs.isEmpty()) {
                         SlackResponse(g.gameText.preText + "\n" +
-                                g.gameText.description.map { it + "\n" }.getOrElse { "" })
+                                g.gameText.description.map { it + "\n" }.getOrElse { "" } +
+                                g.locationOpt().map { it.items
+                                .map { it.name }.fold("", {a, b -> a + "\n" + b}) }
+                                .getOrElse { "" })
                     } else {
                         SlackResponse(g.gameText.preText + "\n" +
                                 g.gameText.description.map { it + "\n" }.getOrElse { "" } +
+                                g.locationOpt().map { it.items
+                                        .map { it.name }.fold("", {a, b -> a + "\n" + b}) }
+                                        .getOrElse { "" } +
                                 mvs)
                     }
                 }
