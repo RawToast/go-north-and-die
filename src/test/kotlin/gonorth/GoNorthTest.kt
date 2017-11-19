@@ -11,6 +11,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class GoNorthTest {
+
+    private val KEY: String = "Key"
+
     private val goNorth = GoNorth()
 
     private val gameState = TestConstants.gameState
@@ -53,7 +56,7 @@ class GoNorthTest {
 
     @Test
     fun canDescribeATarget() {
-        val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE,"Key".some())
+        val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE, KEY.some())
 
         assertEquals("You take a closer look.", newState.gameText.preText)
 
@@ -72,12 +75,13 @@ class GoNorthTest {
     }
 
     @Test
-    fun canDescribeATargetUsingTheHelperMethod() {
-        val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE, "Fox".some())
+    fun canTakeAnItemWhichRemovesItFromTheLocationAndAddsItToTheInventory() {
+        assertEquals(Option.Some(TestConstants.key), gameState.findItem(KEY))
 
-        assertEquals("You take a closer look.", newState.gameText.preText)
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
 
-        assertEquals("There is no Fox", newState.gameText.description.getOrElse { "" })
-        assertTrue(newState.world.links.containsKey(newState.location()?.id))
+        assertEquals(Option.None, newState.findItem(KEY), "The key is removed")
+        assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
+
     }
 }

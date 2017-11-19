@@ -71,5 +71,21 @@ class GameStateExtensionsTest {
         assertTrue(locationOpt2.isEmpty)
     }
 
+    @Test fun canRemoveAnItemFromALocation() {
+
+        val newState = gameState.removeItem("Key")
+
+        assertEquals(Option.Some(TestConstants.key), gameState.findItem("Key"))
+        assertEquals(Option.None, newState.findItem("Key"))
+    }
+
+    @Test fun canPlaceAnItemInThePlayersInventory() {
+        val test = "Test"
+        val item = Item(test, test, test)
+        val newState:GameState = gameState.addToInventory(item)
+
+        assertNotNull(newState.player.inventory.firstOrNull{it.name == test})
+        assertNull(gameState.player.inventory.firstOrNull{it.name == test})
+    }
 
 }

@@ -28,4 +28,8 @@ fun GameState.removeItem(target: String): GameState =
                 it.copy(items = it.items.filterNot { it.name == target }.toSet())}
                     .toSet()))
 
+fun GameState.addToInventory(item: Item): GameState =
+    this.copy(player = this.player.copy(inventory = this.player.inventory.plus(item)))
+
+
 private fun <T> T?.toOpt(): Option<T> = Option.fromNullable(this)

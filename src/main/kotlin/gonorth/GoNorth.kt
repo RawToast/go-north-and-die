@@ -1,10 +1,7 @@
 package gonorth
 
 import gonorth.domain.*
-import kategory.Option
-import kategory.getOrElse
-import kategory.nonEmpty
-import kategory.some
+import kategory.*
 
 class GoNorth {
 
@@ -46,13 +43,10 @@ class GoNorth {
         return gameState.copy(gameText = GameText("You take a closer look.", item))
     }
 
-    private fun take(gameState: GameState, target: String): GameState {
-
-        val item = gameState.findItem(target)
-        val gameStateWithoutItem = gameState.removeItem(target)
-
-        return gameStateWithoutItem
-    }
+    private fun take(gameState: GameState, target: String): GameState =
+            gameState.findItem(target)
+                .map { gameState.removeItem(it.name).addToInventory(it) }
+                .getOrElse { gameState }
 
     private fun use(gameState: GameState, target: String): GameState {
         return gameState
