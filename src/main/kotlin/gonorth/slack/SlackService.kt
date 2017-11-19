@@ -7,18 +7,24 @@ import kategory.getOrElse
 
 class SlackService(private val client: GameClient) {
 
+    private val nl = "\n"
+
+    private val empty = ""
+
     fun createGame(user: Option<String>): Option<SlackResponse> {
         return user.map { u -> client.startGame(u) }
                 .map { g ->
                     val mvs: List<String> = g.world.links
                             .getOrDefault(g.currentLocation, emptySet())
                             .map { it.move.name }
-                    SlackResponse(g.gameText.preText + "\n" +
-                            g.gameText.description.map { it + "\n" }.getOrElse { "" } +
-                            g.locationOpt().map { it.description.plus("\n")}.getOrElse {""} +
-                            g.locationOpt().map { it.items
-                                    .map { it.name }.fold("", {a, b -> a + "\n" + b}) }
-                                    .getOrElse { "" } +
+                    SlackResponse(g.gameText.preText + nl +
+                            g.gameText.description.map { it + nl }.getOrElse { empty } +
+                            g.locationOpt().map { it.description.plus(nl) }.getOrElse { empty } +
+                            g.locationOpt().map {
+                                it.items
+                                        .map { it.name }.fold(empty, { a, b -> a + nl + b })
+                            }
+                                    .getOrElse { empty } +
                             mvs)
                 }
     }
@@ -35,17 +41,21 @@ class SlackService(private val client: GameClient) {
                             .map { it.move.name }
 
                     if (mvs.isEmpty()) {
-                        SlackResponse(g.gameText.preText + "\n" +
-                                g.gameText.description.map { it + "\n" }.getOrElse { "" } +
-                                g.locationOpt().map { it.items
-                                .map { it.name }.fold("", {a, b -> a + "\n" + b}) }
-                                .getOrElse { "" })
+                        SlackResponse(g.gameText.preText + nl +
+                                g.gameText.description.map { it + nl }.getOrElse { empty } +
+                                g.locationOpt().map {
+                                    it.items
+                                            .map { it.ingameText }.fold(empty, { a, b -> a + b })
+                                }
+                                        .getOrElse { empty })
                     } else {
-                        SlackResponse(g.gameText.preText + "\n" +
-                                g.gameText.description.map { it + "\n" }.getOrElse { "" } +
-                                g.locationOpt().map { it.items
-                                        .map { it.name }.fold("", {a, b -> a + "\n" + b}) }
-                                        .getOrElse { "" } +
+                        SlackResponse(g.gameText.preText + nl +
+                                g.gameText.description.map { it + nl }.getOrElse { empty } +
+                                g.locationOpt().map {
+                                    it.items
+                                            .map { it.ingameText }.fold(empty, { a, b -> a + b })
+                                }
+                                        .getOrElse { empty } + nl +
                                 mvs)
                     }
                 }

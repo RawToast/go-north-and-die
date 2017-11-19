@@ -43,10 +43,16 @@ class GoNorth {
         return gameState.copy(gameText = GameText("You take a closer look.", item))
     }
 
-    private fun take(gameState: GameState, target: String): GameState =
-            gameState.findItem(target)
+    private fun take(gameState: GameState, target: String): GameState {
+
+        val gsWithItem = gameState.findItem(target)
                 .map { gameState.removeItem(it.name).addToInventory(it) }
                 .getOrElse { gameState }
+
+        val text = GameText( "You take the $target" , Option.Some(""))
+
+        return gsWithItem.copy(gameText = text)
+    }
 
     private fun use(gameState: GameState, target: String): GameState {
         return gameState
