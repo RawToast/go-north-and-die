@@ -24,7 +24,7 @@ object TestConstants {
 
     private val gameText = GameText("You venture into a dark dungeon",
             Option.None)
-    private val player = Player(1000, emptySet(), alive = true)
+    val player = Player(1000, emptySet(), alive = true)
 
     private val builder = WorldBuilder().newLocation(location1)
             .newLocation(location2)

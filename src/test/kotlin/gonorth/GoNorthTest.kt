@@ -34,6 +34,18 @@ class GoNorthTest {
         assertFalse(newState.world.links.containsKey(newState.location()?.id))
     }
 
+    @Test // I think this must happen!
+    fun whenGivenNorthWithTheRealMapThePlayerDies() {
+        val stateWithRealWorld = SimpleGameStateGenerator()
+                .generate(TestConstants.player, 123L)
+        val newState = goNorth.takeAction(stateWithRealWorld, NORTH, Option.None)
+
+        assertEquals("You stumble ahead", newState.gameText.preText)
+        assertTrue(newState.location()?.description.orEmpty().contains("You went north and died"))
+        assertTrue(newState.gameText.description.getOrElse { "" }.contains("You went north and died"))
+        assertFalse(newState.world.links.containsKey(newState.location()?.id))
+    }
+
     @Test
     fun whenGivenEastThePlayerWins() {
         val newState = goNorth.takeAction(gameState, EAST, Option.None)
@@ -44,6 +56,18 @@ class GoNorthTest {
         assertEquals("and won!", newState.gameText.description.getOrElse { "" })
 
         assertTrue(newState.world.links.containsKey(newState.location()?.id))
+    }
+
+    @Test
+    fun whenGivenADirectionThatDoesNotExist() {
+        val newState = goNorth.takeAction(gameState, SOUTH, Option.None)
+        val newState2 = goNorth.takeAction(gameState, WEST, Option.None)
+
+        assertEquals(gameState.gameText.preText, newState.gameText.preText)
+        assertEquals(gameState.gameText.description, newState.gameText.description)
+
+        assertEquals(gameState.gameText.preText, newState2.gameText.preText)
+        assertEquals(gameState.gameText.description, newState2.gameText.description)
     }
 
     @Test
