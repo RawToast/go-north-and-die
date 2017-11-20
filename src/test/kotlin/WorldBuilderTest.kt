@@ -52,7 +52,7 @@ class WorldBuilderTest {
     }
 
     @Test fun canAddAnItem() {
-        val item = Item("TestItem", "Test Description")
+        val item = Item("TestItem", "Test Description", "Testing.")
         val world = worldBuilder.placeItem(p1, item).world
 
         assertTrue(world.locations.size == 1, "Only one location")

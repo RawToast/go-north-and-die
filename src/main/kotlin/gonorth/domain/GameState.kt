@@ -8,11 +8,11 @@ data class GameState(val gameText: GameText, val world: World, val currentLocati
 
 data class GameText(val preText: String, val description: Option<String>)
 
-data class World(val locations: Set<Location>, val links: Map<UUID, Set<Links>>)
+data class World(val locations: Set<Location>, val links: Map<UUID, Set<Link>>)
 data class Location(val id: UUID, val description: String, val items: Set<Item>)
-data class Links(val to: UUID, val move: Move, val description: String)
+data class Link(val to: UUID, val move: Move, val description: String)
 
-data class Item(val name: String, val description: String)
+data class Item(val name: String, val description: String, val ingameText: String)
 
 data class Player(val hunger: Int, val inventory: Set<Item>, val alive:Boolean)
 

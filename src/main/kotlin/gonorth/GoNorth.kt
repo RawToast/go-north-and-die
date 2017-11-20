@@ -1,38 +1,31 @@
 package gonorth
 
 import gonorth.domain.*
-import kategory.Option
-import kategory.Option.None
-import kategory.Option.Some
-import kategory.getOrElse
-import kategory.nonEmpty
+import kategory.*
 
 class GoNorth {
 
-    fun takeAnyAction(gameState: GameState, move: Move, command: Option<String>): GameState {
-        return if (movementActions.contains(move)) {
-            takeAction(gameState, move)
-        } else if (command.nonEmpty()) {
-            takeActionWithTarget(gameState, move, command.getOrElse { "" })
-        } else gameState
-    }
+    fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState =
+            handleActionWithTarget(move, gameState, command.getOrElse { "" })
 
-    fun takeAction(gameState: GameState, move: Move): GameState {
-        return if (movementActions.contains(move)) {
-            handleMovement(gameState, move).getOrElse { gameState }
-        } else gameState
+    private fun handleActionWithTarget(move: Move, gameState: GameState, target: String): GameState = when(move) {
+        Move.NORTH -> handleMovement(gameState, move).getOrElse { gameState }
+        Move.EAST -> handleMovement(gameState, move).getOrElse { gameState }
+        Move.SOUTH -> handleMovement(gameState, move).getOrElse { gameState }
+        Move.WEST -> handleMovement(gameState, move).getOrElse { gameState }
+        Move.DESCRIBE -> describe(gameState, target)
+        Move.TAKE -> take(gameState, target)
+        Move.USE -> use(gameState, target)
+        Move.EAT -> eat(gameState, target)
     }
-
-    fun takeActionWithTarget(gameState: GameState, move: Move, target: String): GameState =
-            handleActionWithTarget(move, gameState, target)
 
     private fun handleMovement(gameState: GameState, move: Move): Option<GameState> {
-        val location = gameState.locationOpt()
-                .flatMap { gameState.world.links[it.id].toOpt() }
+        val location: Option<Link> = gameState.locationOpt()
+                .flatMap { gameState.fetchLinks(it.id) }
                 .flatMap { it.find { it.move == move }.toOpt() }
 
         val newPlace = location.flatMap { l ->
-            gameState.world.locations.find { it.id == l.to}.toOpt() }
+            gameState.findLocation(l.to) }
                 .map { it.description }
 
         return location
@@ -41,28 +34,33 @@ class GoNorth {
                         currentLocation = id) }
     }
 
-    private fun handleActionWithTarget(move: Move, gameState: GameState, target: String): GameState {
-        return if (movementActions.contains(move)) {
-            handleMovement(gameState, move).getOrElse { gameState }
-        } else {
+    private fun describe(gameState: GameState, target: String): GameState {
+        val item = gameState.findItem(target)
+                            .map { it.description }
+                            .getOrElse { "There is no $target" }
+                            .some()
 
-            val item = gameState.locationOpt()
-                    .flatMap {
-                        it.items.find { it.name == target }.toOpt()
-                                .map { it.description }
-                    }
+        return gameState.copy(gameText = GameText("You take a closer look.", item))
+    }
 
-            when (item) {
-                is Some -> gameState
-                        .copy(gameText = GameText("You take a closer look.", item))
-                is None -> gameState
-                        .copy(gameText = GameText("You take a closer look.", Some("There is no $target")))
-            }
-        }
+    private fun take(gameState: GameState, target: String): GameState {
+
+        val gsWithItem = gameState.findItem(target)
+                .map { gameState.removeItem(it.name).addToInventory(it) }
+                .getOrElse { gameState }
+
+        val text = GameText( "You take the $target" , Option.Some(""))
+
+        return gsWithItem.copy(gameText = text)
+    }
+
+    private fun use(gameState: GameState, target: String): GameState {
+        return gameState
+    }
+
+    private fun eat(gameState: GameState, target: String): GameState {
+        return gameState
     }
 
     private fun <T> T?.toOpt(): Option<T> = Option.fromNullable(this)
-
-    private val movementActions = listOf(Move.NORTH, Move.SOUTH, Move.EAST, Move.WEST)
-    private val targetActions = listOf(Move.DESCRIBE)
 }

@@ -13,9 +13,9 @@ class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
 
     fun linkLocation(from: Location, to: Location, move: Move, description: String): WorldBuilder {
 
-        val link = Links(to.id, move, description)
+        val link = Link(to.id, move, description)
 
-        val x: Set<Links> = world.links.getOption(from.id)
+        val x: Set<Link> = world.links.getOption(from.id)
                 .map { it.filterNot { l -> l.to == to.id && move == l.move } }
                 .map { it.plus(link) }
                 .fold({ setOf(link) }, { l -> l.toSet() })
