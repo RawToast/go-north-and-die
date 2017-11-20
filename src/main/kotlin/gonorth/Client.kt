@@ -1,7 +1,6 @@
 package gonorth
 
 import gonorth.domain.*
-import gonorth.slack.toOpt
 import kategory.Option
 import kategory.getOrElse
 import java.util.*

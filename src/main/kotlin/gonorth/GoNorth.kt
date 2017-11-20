@@ -62,5 +62,4 @@ class GoNorth {
         return gameState
     }
 
-    private fun <T> T?.toOpt(): Option<T> = Option.fromNullable(this)
 }

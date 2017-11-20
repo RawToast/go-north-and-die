@@ -1,5 +1,6 @@
 package gonorth.domain
 
+import gonorth.toOpt
 import kategory.Option
 import java.util.*
 
@@ -30,6 +31,3 @@ fun GameState.removeItem(target: String): GameState =
 
 fun GameState.addToInventory(item: Item): GameState =
     this.copy(player = this.player.copy(inventory = this.player.inventory.plus(item)))
-
-
-private fun <T> T?.toOpt(): Option<T> = Option.fromNullable(this)

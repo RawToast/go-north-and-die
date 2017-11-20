@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import gonorth.GoNorth
 import gonorth.SimpleGameClient
 import gonorth.domain.SimpleGameStateGenerator
+import gonorth.toOpt
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -89,8 +90,4 @@ fun Application.module() {
 }
 
 data class SlackResponse(val text: String)
-
-fun <T> T?.toOpt(): Option<T> {
-    return Option.fromNullable(this)
-}
 
