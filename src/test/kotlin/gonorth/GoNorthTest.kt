@@ -89,6 +89,16 @@ class GoNorthTest {
     }
 
     @Test
+    fun canDescribeATargetIgnoresCase() {
+        val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE, "kEy".some())
+
+        assertEquals("You take a closer look.", newState.gameText.preText)
+
+        assertEquals("It's a shiny golden key.", newState.gameText.description.getOrElse{""})
+        assertTrue(newState.world.links.containsKey(newState.location()?.id))
+    }
+
+    @Test
     fun canDescribeATargetThatDoesntExist() {
         val newState = goNorth.takeAction(TestConstants.gameState, DESCRIBE, "Fox".some())
 
@@ -107,5 +117,15 @@ class GoNorthTest {
         assertEquals(Option.None, newState.findItem(KEY), "The key is removed")
         assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
 
+    }
+
+    @Test
+    fun canTakeAnItemIgnoresCase() {
+        assertEquals(Option.Some(TestConstants.key), gameState.findItem("keY"))
+
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
+
+        assertEquals(Option.None, newState.findItem("KeY"), "The key is removed")
+        assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
     }
 }

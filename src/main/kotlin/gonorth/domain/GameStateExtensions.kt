@@ -20,13 +20,13 @@ fun GameState.findLocation(uuid: UUID): Option<Location> =
         this.world.locations.find { it.id == uuid}.toOpt()
 
 fun GameState.findItem(target: String): Option<Item> =
-        this.locationOpt().flatMap { it.items.find { it.name == target }.toOpt()}
+        this.locationOpt().flatMap { it.items.find { it.name.equals(target, ignoreCase = true) }.toOpt()}
 
 
 fun GameState.removeItem(target: String): GameState =
         this.copy(world = this.world.copy(locations =
             this.world.locations.map {
-                it.copy(items = it.items.filterNot { it.name == target }.toSet())}
+                it.copy(items = it.items.filterNot { it.name.equals(target, ignoreCase = true) }.toSet())}
                     .toSet()))
 
 fun GameState.addToInventory(item: Item): GameState =

@@ -33,7 +33,7 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth,
         val res = db[userId].toOpt()
                 .flatMap { gs ->
                     Move.values()
-                            .find { m -> m.name == moveStr }
+                            .find { m -> m.name.equals(moveStr, ignoreCase = true) }
                             .toOpt()
                             .map { engine.takeAction(gs, it, commandOpt)  }
                 }

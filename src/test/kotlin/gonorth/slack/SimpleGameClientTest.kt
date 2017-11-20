@@ -52,6 +52,29 @@ class SimpleGameClientTest {
     }
 
     @Test
+    fun takeInputShouldMoveThePlayerWhenGivenAValidDirectionIgnoringCase() {
+        val user = "Davey"
+        val textOpt = "NoRtH"
+        val createdGame: GameState = gameClient.startGame(user)
+        val resultOpt: Option<GameState> = gameClient.takeInput(user, textOpt)
+        val result = resultOpt.getOrElse { createdGame }
+
+        assertTrue { resultOpt.nonEmpty() }
+        assertNotEquals(createdGame, result)
+
+        val initialText = createdGame.gameText
+        val resultText = result.gameText
+
+        assertTrue(resultText.preText.isNotEmpty())
+        assertNotEquals(initialText.preText, resultText.preText)
+        assertNotEquals(initialText.description, resultText.description)
+        assertTrue(resultText.description.getOrElse { "" }.isNotEmpty())
+        assertNotEquals(resultText.preText, resultText.description.getOrElse { "" })
+
+        assertNotEquals(createdGame.location(), result.location())
+    }
+
+    @Test
     fun takeInputShouldHandleAValidCommandRequest() {
         val user = "Jones"
         val textOpt = "${Move.DESCRIBE.name} Key"
