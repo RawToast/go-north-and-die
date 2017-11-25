@@ -20,18 +20,19 @@ class GoNorth {
     }
 
     private fun handleMovement(gameState: GameState, move: Move): Option<GameState> {
-        val location: Option<Link> = gameState.locationOpt()
+        val linkToNewLocation: Option<Link> = gameState.locationOpt()
                 .flatMap { gameState.fetchLinks(it.id) }
                 .flatMap { it.find { it.move == move }.toOpt() }
 
-        val newPlace = location.flatMap { l ->
+        val newPlace = linkToNewLocation.flatMap { l ->
             gameState.findLocation(l.to) }
                 .map { it.description }
 
-        return location
+        return linkToNewLocation
                 .map { (id, _, preText) -> gameState.copy(
                         gameText = GameText(preText, newPlace),
                         currentLocation = id) }
+                .map { it.updateTextWithItems() }
     }
 
     private fun describe(gameState: GameState, target: String): GameState {
@@ -49,9 +50,11 @@ class GoNorth {
                 .map { gameState.removeItem(it.name).addToInventory(it) }
                 .getOrElse { gameState }
 
-        val text = GameText( "You take the $target" , Option.Some(""))
+        val descriptionOpt = gsWithItem.locationOpt().map { it.description }
+        val text = GameText( "You take the $target" , descriptionOpt)
 
         return gsWithItem.copy(gameText = text)
+                .updateTextWithItems()
     }
 
     private fun use(gameState: GameState, target: String): GameState {
@@ -63,3 +66,4 @@ class GoNorth {
     }
 
 }
+

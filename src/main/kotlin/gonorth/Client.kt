@@ -2,7 +2,6 @@ package gonorth
 
 import gonorth.domain.*
 import kategory.Option
-import kategory.getOrElse
 import java.util.*
 
 interface GameClient {

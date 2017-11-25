@@ -20,11 +20,6 @@ class SlackService(private val client: GameClient) {
                     SlackResponse(g.gameText.preText + nl +
                             g.gameText.description.map { it + nl }.getOrElse { empty } +
                             g.locationOpt().map { it.description.plus(nl) }.getOrElse { empty } +
-                            g.locationOpt().map {
-                                it.items
-                                        .map { it.name }.fold(empty, { a, b -> a + nl + b })
-                            }
-                                    .getOrElse { empty } +
                             mvs)
                 }
     }
@@ -42,21 +37,13 @@ class SlackService(private val client: GameClient) {
 
                     if (mvs.isEmpty()) {
                         SlackResponse(g.gameText.preText + nl +
-                                g.gameText.description.map { it + nl }.getOrElse { empty } +
-                                g.locationOpt().map {
-                                    it.items
-                                            .map { it.ingameText }.fold(empty, { a, b -> a + b })
-                                }
-                                        .getOrElse { empty })
+                                g.gameText.description.map { it + nl }.getOrElse { empty })
                     } else {
                         SlackResponse(g.gameText.preText + nl +
-                                g.gameText.description.map { it + nl }.getOrElse { empty } +
-                                g.locationOpt().map {
-                                    it.items
-                                            .map { it.ingameText }.fold(empty, { a, b -> a + b })
-                                }
-                                        .getOrElse { empty } + nl +
-                                mvs)
+                                g.gameText.description.map { it + nl }.getOrElse { empty }
+                                + nl
+                                + mvs
+                                )
                     }
                 }
     }

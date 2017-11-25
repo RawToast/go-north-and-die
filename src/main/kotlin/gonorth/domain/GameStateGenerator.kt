@@ -10,14 +10,16 @@ interface GameStateGenerator {
 
 class SimpleGameStateGenerator : GameStateGenerator {
     override fun generate(player: Player, seed:Long): GameState {
-        val key = Item("Key", "Shiny key, looks useful", "A key rests on the ground.")
+        val key = Item("Key", "Shiny key, looks useful",
+                " except for a small golden key")
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
         val p2 = Location(UUID.randomUUID(), "The path comes to an abrupt end.", emptySet())
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
         val p4 = Location(UUID.randomUUID(),
                 "The road continues to the west, whilst a side path heads south.", emptySet())
-        val p5 = Location(UUID.randomUUID(), "A river blocks your path.", setOf(key))
+        val p5 = Location(UUID.randomUUID(), "You come to an opening in the forest. " +
+                "The path is green with moss{key}. A large river blocks your path.", setOf(key))
         val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
         val p7 = Location(UUID.randomUUID(),
                 "You look at the tower door in front of you. Rocks fall, You die.", emptySet())
