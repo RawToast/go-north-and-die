@@ -2,6 +2,7 @@ package gonorth.domain
 
 import gonorth.toOpt
 import kategory.Option
+import kategory.getOrElse
 import java.util.*
 
 fun GameState.location(): Location? {
@@ -31,3 +32,22 @@ fun GameState.removeItem(target: String): GameState =
 
 fun GameState.addToInventory(item: Item): GameState =
     this.copy(player = this.player.copy(inventory = this.player.inventory.plus(item)))
+
+
+// Drescriptive
+
+fun GameState.updateTextWithItems(): GameState {
+    val items = this.locationOpt()
+                .map { it.items }
+                .getOrElse { emptySet() }
+
+
+    val newDescr: Option<GameText> = this.gameText.description.map {
+        items.fold(it) { d, i ->
+            d.replace("{${i.name}}", i.ingameText, ignoreCase = true)
+        }
+    }.map{ d -> GameText(this.gameText.preText, Option.Some(d))}
+
+
+    return newDescr.foldL(this, {gs, gt -> gs.copy(gameText = gt)})
+}

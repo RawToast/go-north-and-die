@@ -21,7 +21,7 @@ class GoNorthTest {
     @Test
     fun thePlayerStartsAtTheStartingPlace() {
         assertTrue(gameState.gameText.preText == "You venture into a dark dungeon")
-        assertTrue(gameState.location()?.description == "Starting to")
+        assertFalse(gameState.location()?.description.isNullOrBlank())
     }
 
     @Test

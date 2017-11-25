@@ -1,18 +1,12 @@
 package gonorth.domain
 
 import gonorth.TestConstants
-import gonorth.domain.location
-import gonorth.domain.locationOpt
 import gonorth.world.WorldBuilder
 import kategory.Option
 import kategory.getOrElse
 import kategory.nonEmpty
 import org.junit.Test
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class GameStateExtensionsTest {
 
@@ -86,6 +80,23 @@ class GameStateExtensionsTest {
 
         assertNotNull(newState.player.inventory.firstOrNull{it.name == test})
         assertNull(gameState.player.inventory.firstOrNull{it.name == test})
+    }
+
+    @Test fun canUpdateGameTextForANewLocation() {
+        val gameStateWithDescription = gameState.copy(
+                gameText = GameText("Pre is irrelevant",
+                description = Option.Some(TestConstants.location1.description)))
+
+        val newState:GameState = gameStateWithDescription.updateTextWithItems()
+
+        assertNotNull(newState.gameText.preText)
+        assertTrue(gameStateWithDescription.gameText.description.nonEmpty(), "Should have description")
+        assertTrue(newState.gameText.description.nonEmpty(), "Should have description")
+
+        val preText = newState.gameText.preText
+        val description = newState.gameText.description.getOrElse { "" }
+        assertFalse(preText.contains("A shiny key is on the floor."))
+        assertTrue(description.contains("A shiny key is on the floor."))
     }
 
 }

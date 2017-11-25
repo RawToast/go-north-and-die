@@ -18,7 +18,9 @@ object TestConstants {
 
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor.")
 
-    val location1 = Location(startingLocationUUID, "Starting to", setOf(key))
+    val location1 = Location(startingLocationUUID,
+            "You seem to be in a test. You spot some null pointers to the west. {key} " +
+                    "An alternative path heads to the east", setOf(key))
     val location2 = Location(location2UUID, "You went north and died", emptySet())
     val location3 = Location(location3UUID, "and won!", emptySet())
 
