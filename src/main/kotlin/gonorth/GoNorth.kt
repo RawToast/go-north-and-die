@@ -50,9 +50,11 @@ class GoNorth {
                 .map { gameState.removeItem(it.name).addToInventory(it) }
                 .getOrElse { gameState }
 
-        val text = GameText( "You take the $target" , Option.Some(""))
+        val descriptionOpt = gsWithItem.locationOpt().map { it.description }
+        val text = GameText( "You take the $target" , descriptionOpt)
 
         return gsWithItem.copy(gameText = text)
+                .updateTextWithItems()
     }
 
     private fun use(gameState: GameState, target: String): GameState {

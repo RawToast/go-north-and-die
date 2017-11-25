@@ -4,6 +4,7 @@ import gonorth.domain.*
 import gonorth.domain.Move.*
 import kategory.Option
 import kategory.getOrElse
+import kategory.nonEmpty
 import kategory.some
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -113,10 +114,14 @@ class GoNorthTest {
         assertEquals(Option.Some(TestConstants.key), gameState.findItem(KEY))
 
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
+        val newDescription = newState.gameText.description.getOrElse { "" }
 
         assertEquals(Option.None, newState.findItem(KEY), "The key is removed")
         assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
-
+        assertTrue(newState.gameText.description.nonEmpty())
+        assertFalse(newDescription.contains("key", ignoreCase = true))
+        assertEquals("You seem to be in a test. You spot some null pointers to the west. " +
+                "An alternative path heads to the east", newDescription)
     }
 
     @Test
