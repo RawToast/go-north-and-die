@@ -1,10 +1,8 @@
 package gonorth.slack
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import gonorth.GoNorth
-import gonorth.SimpleGameClient
+import gonorth.*
 import gonorth.domain.SimpleGameStateGenerator
-import gonorth.toOpt
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -34,7 +32,8 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
 
-    val client = SimpleGameClient(kotlin.collections.mapOf(), GoNorth(), SimpleGameStateGenerator())
+    val interpreter = ActionInterpreterFactory()
+    val client = SimpleGameClient(kotlin.collections.mapOf(), GoNorth(interpreter), SimpleGameStateGenerator())
 
     val slackService = SlackService(client)
 

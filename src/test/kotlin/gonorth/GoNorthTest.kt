@@ -15,7 +15,8 @@ class GoNorthTest {
 
     private val KEY: String = "Key"
 
-    private val goNorth = GoNorth()
+    private val factory = ActionInterpreterFactory()
+    private val goNorth = GoNorth(factory)
 
     private val gameState = TestConstants.gameState
 

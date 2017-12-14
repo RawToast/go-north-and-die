@@ -4,7 +4,7 @@ import gonorth.domain.*
 import kategory.*
 import java.util.*
 
-class GoNorth {
+class GoNorth(val interpreterFactory: ActionInterpreterFactory) {
 
     fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState =
             handleActionWithTarget(move, gameState, command.getOrElse { "" })
@@ -63,36 +63,17 @@ class GoNorth {
 
 
     private fun use(gameState: GameState, target: String): GameState {
+        val interpreter = interpreterFactory.createInterpreter(gameState)
         val rr: GameEffect<GameState> = GameEffect.KillPlayer("You bash yourself on the head with the $target")
         val rr2: GameEffect<GameState> = GameEffect.KillPlayer("You bash yourself on the head with the $target")
 
-
         val mylist: List<GameEffect<GameState>> = listOf(rr, rr2)
 
-        val liftedList = listOf(rr, rr2).map { Free.liftF(it) }
-
-        mylist.reduce({op1, op2 -> op1})
-
-//        liftedList.reduce({op1, op2 -> op1.flatMap { g -> op2 }()})
-
-        val freeR = Free.liftF(rr)
-        val freeS = Free.liftF(rr2)
-
-        val xy = freeR.flatMap { gs -> freeS }
-
-
-        val listOfStuff: List<FreeEffect> = emptyList()
-
-        fun toFree(text: String): (GameState) -> GameEffect.KillPlayer = { gs: GameState -> GameEffect.KillPlayer(gs, text) }
-
-        val frees = listOf("Turnip", "Banana").map { toFree(it) }
-
-        val cc = toFree("Cool")(gameState)
-
-
-
-        return gameState
+        return mylist.map{ Free.liftF(it) }
+                .reduce( { op1, op2 -> op1.flatMap { op2 }}).ev()
+                .foldMap(interpreter, Id.monad()).extract()
     }
+
 
     private fun eat(gameState: GameState, target: String): GameState {
         return gameState
@@ -101,12 +82,13 @@ class GoNorth {
 }
 
 typealias FreeEffect = Free<GameEffect.F, GameState>
+fun <A> HK<GameEffect.F, A>.ev(): GameEffect<A> = this as GameEffect<A>
 
 // Free the monads!
 sealed class GameEffect<out A> : HK<GameEffect.F, A> {
     sealed class F private constructor()
 
-
+    data class Describe(val text: String): GameEffect<GameState>()
     data class KillPlayer(val text: String) : GameEffect<GameState>()
     data class TeleportPlayer(val locationUUID: UUID, val text: String) : GameEffect<GameState>()
     data class OneWayLink(val link: LinkDetails, val text: String) : GameEffect<GameState>()
@@ -115,16 +97,58 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
     data class LinkDetails(val from: UUID, val to: UUID, val move: Move, val description: String)
 
     companion object : FreeMonadInstance<GameEffect.F> {
-        fun createOneWayLink(link: LinkDetails, text: String): Free<GameEffect.F, GameState> =
+        fun describe(text: String): Free<GameEffect.F, GameState> =
+                Free.liftF(Describe(text))
+
+        fun createOneWayLink(link: LinkDetails, text: String): FreeEffect =
                 Free.liftF(OneWayLink(link, text))
 
-        fun createTwoWayLink(link: LinkDetails, returnLink: LinkDetails, text: String): Free<GameEffect.F, GameState> =
+        fun createTwoWayLink(link: LinkDetails, returnLink: LinkDetails, text: String): FreeEffect =
                 Free.liftF(TwoWayLink(link, returnLink, text))
 
-        fun killThePlayer(text: String): Free<GameEffect.F, GameState> =
+        fun killThePlayer(text: String): FreeEffect =
                 Free.liftF(KillPlayer(text))
 
-        fun teleportPlayer(locationUUID: UUID, text: String): Free<GameEffect.F, GameState> =
+        fun teleportPlayer(locationUUID: UUID, text: String): FreeEffect =
                 Free.liftF(TeleportPlayer(locationUUID, text))
     }
 }
+
+class ActionInterpreterFactory() {
+    fun createInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {
+        return object : FunctionK<GameEffect.F, IdHK> {
+            // Need state construct from Cats
+            var gs: GameState = gameState.copy()
+
+            override fun <A>invoke(fas: HK<GameEffect.F, A>): Id<A> {
+                val op = fas.ev()
+
+                return when (op) {
+                    is GameEffect.KillPlayer -> {
+                        gs = gs.appendDescription(op.text)
+                        Id.pure(gs)
+                    }
+                    is GameEffect.TeleportPlayer -> {
+                        gs = gs.appendDescription(op.text)
+                        Id.pure(gs)
+                    }
+                    is GameEffect.OneWayLink -> {
+                        gs = gs.appendDescription(op.text)
+                        Id.pure(gs)
+                    }
+                    is GameEffect.TwoWayLink -> {
+                        gs = gs.appendDescription(op.text)
+                        Id.pure(gs)
+                    }
+                    is GameEffect.Describe -> {
+                        gs = gs.appendDescription(op.text)
+                        Id.pure(gs)
+                    }
+                } as Id<A>
+            }
+        }
+    }
+}
+
+
+

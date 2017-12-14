@@ -15,8 +15,8 @@ import kotlin.test.assertTrue
 
 
 class SimpleGameClientTest {
-
-    val goNorth = GoNorth()
+    private val factory = ActionInterpreterFactory()
+    val goNorth = GoNorth(factory)
     val gameClient: GameClient = SimpleGameClient(emptyMap(), goNorth, TinyGameStateGenerator())
 
     @Test

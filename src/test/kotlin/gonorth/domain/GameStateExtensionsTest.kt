@@ -118,4 +118,27 @@ class GameStateExtensionsTest {
         assertEquals("There is a table apples, and some shoes", newDescription)
     }
 
+    @Test fun canAppendTextToTheDescription() {
+        val textToAppend = "Text to append"
+        val gameStateWithDescription = gameState.copy(
+                gameText = GameText("Pre is irrelevant",
+                        description = Option.Some(TestConstants.location1.description)))
+        val newState = gameStateWithDescription.appendDescription(textToAppend)
+
+        assertTrue(newState.gameText.description.map { it.contains(textToAppend) }.getOrElse { false })
+        assertTrue(newState.gameText.description.map { it.contains("\n") }.getOrElse { false })
+        assertTrue(newState.gameText.description.map {
+            it.contains(TestConstants.location1.description) }.getOrElse { false })
+
+    }
+
+    @Test fun canAppendTextWhenTheDescriptionDoesNotExist() {
+        val textToAppend = "Text to append"
+
+        val newState = gameState.appendDescription(textToAppend)
+
+        assertTrue(newState.gameText.description.map { it.contains(textToAppend) }.getOrElse { false })
+        assertFalse(newState.gameText.description.map { it.contains("\n") }.getOrElse { true })
+    }
+
 }
