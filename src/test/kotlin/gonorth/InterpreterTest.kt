@@ -1,8 +1,14 @@
 package gonorth
 
+import gonorth.GameEffect.*
 import gonorth.domain.GameState
+import gonorth.domain.Move
+import gonorth.domain.location
+import gonorth.domain.locationOpt
 import kategory.*
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ActionInterpreterTest {
@@ -43,5 +49,67 @@ class ActionInterpreterTest {
         assertTrue { descriptionIncludes( result, "And then something moar!!!") }
     }
 
+    @Test
+    fun canChangeThePlayersLocation() {
+        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val effect= GameEffect.teleportPlayer(TestConstants.location2UUID ,"You are teleported")
 
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.gameText.description.exists { it.contains("You are teleported") } }
+        assertEquals(TestConstants.location2UUID, result.currentLocation)
+        assertTrue { result.gameText.description.exists { it.contains(TestConstants.location2.description) } }
+    }
+
+    @Test
+    fun canCreateALinkToAnotherLocation() {
+        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val effect= GameEffect.createOneWayLink(
+                LinkDetails(TestConstants.startingLocationUUID, TestConstants.location4UUID,
+                        Move.SOUTH, "You walk through the portal"), "A portal appears to the south")
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.gameText.description.exists { it.contains("A portal appears to the south") } }
+        assertEquals(TestConstants.startingLocationUUID, result.currentLocation)
+        assertEquals(2, gameState.world.links[TestConstants.startingLocationUUID]?.size)
+        assertEquals(3, result.world.links[TestConstants.startingLocationUUID]?.size)
+
+    }
+
+    @Test
+    fun canCreateATwoWayLinkToAnotherLocation() {
+        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val effect= GameEffect.createTwoWayLink(
+                LinkDetails(TestConstants.startingLocationUUID, TestConstants.location4UUID,
+                        Move.SOUTH, "You walk through the portal"),
+                LinkDetails(TestConstants.location4UUID, TestConstants.startingLocationUUID,
+                        Move.EAST, "You go back through the portal"),
+                            "A portal appears to the south")
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.gameText.description.exists { it.contains("A portal appears to the south") } }
+        assertEquals(TestConstants.startingLocationUUID, result.currentLocation)
+        assertEquals(2, gameState.world.links[TestConstants.startingLocationUUID]?.size)
+        assertEquals(3, result.world.links[TestConstants.startingLocationUUID]?.size)
+
+        // Links the other location
+        assertEquals(1, result.world.links[TestConstants.location4UUID]?.size)
+    }
+
+    @Test
+    fun canKillThePlayer() {
+        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val effect= GameEffect.killThePlayer("You explode")
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.gameText.description.exists { it.contains("You explode") } }
+        assertFalse { result.player.alive }
+    }
 }

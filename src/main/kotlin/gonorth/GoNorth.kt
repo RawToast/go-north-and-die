@@ -1,6 +1,7 @@
 package gonorth
 
 import gonorth.domain.*
+import gonorth.world.WorldBuilder
 import kategory.*
 import java.util.*
 
@@ -126,18 +127,32 @@ class ActionInterpreterFactory() {
                 return when (op) {
                     is GameEffect.KillPlayer -> {
                         gs = gs.appendDescription(op.text)
+                        gs = gs.copy(player = gs.player.copy(alive = false))
                         Id.pure(gs)
                     }
                     is GameEffect.TeleportPlayer -> {
                         gs = gs.appendDescription(op.text)
+                        gs = gs.copy(currentLocation = op.locationUUID)
+                        gs = gs.findLocation(op.locationUUID)
+                                .map { it.description }
+                                .fold({gs}, {s -> gs.appendDescription(s)})
                         Id.pure(gs)
                     }
                     is GameEffect.OneWayLink -> {
                         gs = gs.appendDescription(op.text)
+                        gs = gs.copy(world = WorldBuilder(gs.world)
+                                    .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
+                                    .world)
                         Id.pure(gs)
                     }
                     is GameEffect.TwoWayLink -> {
                         gs = gs.appendDescription(op.text)
+                        gs = gs.copy(world = WorldBuilder(gs.world)
+                                .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
+                                .world)
+                        gs = gs.copy(world = WorldBuilder(gs.world)
+                                .linkLocation(op.returnLink.from, op.returnLink.to, op.returnLink.move, op.returnLink.description)
+                                .world)
                         Id.pure(gs)
                     }
                     is GameEffect.Describe -> {
