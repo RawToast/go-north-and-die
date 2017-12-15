@@ -19,7 +19,8 @@ object TestConstants {
     val location4UUID = UUID.fromString(UUID4)!!
 
 
-    val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ")
+    val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",
+            Option.None, emptyList())
 
     val location1 = Location(startingLocationUUID,
             "You seem to be in a test. You spot some null pointers to the west. {key}" +
@@ -39,7 +40,8 @@ object TestConstants {
             .linkLocation(location1, location2, Move.NORTH, "You stumble ahead")
             .twoWayLink(location1, location3,
                     Move.EAST, Move.WEST, "You head east...", "You stroll west")
-            .placeItem(location1, Item("Key", "It's a shiny golden key.", "A key rests on the ground."))
+            .placeItem(location1, Item("Key", "It's a shiny golden key.",
+                    "A key rests on the ground.", Option.None, emptyList()))
 
     val world = builder.world
 

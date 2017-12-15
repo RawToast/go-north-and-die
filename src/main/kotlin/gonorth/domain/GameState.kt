@@ -1,5 +1,6 @@
 package gonorth.domain
 
+import gonorth.GameEffect
 import kategory.Option
 import java.util.*
 
@@ -12,7 +13,7 @@ data class World(val locations: Set<Location>, val links: Map<UUID, Set<Link>>)
 data class Location(val id: UUID, val description: String, val items: Set<Item>)
 data class Link(val to: UUID, val move: Move, val description: String)
 
-data class Item(val name: String, val description: String, val ingameText: String)
+data class Item(val name: String, val description: String, val ingameText: String, val requiredLocation: Option<UUID>, val effects: List<GameEffect<GameState>>)
 
 data class Player(val hunger: Int, val inventory: Set<Item>, val alive:Boolean)
 

@@ -64,15 +64,14 @@ class GoNorth(val interpreterFactory: ActionInterpreterFactory) {
 
 
     private fun use(gameState: GameState, target: String): GameState {
-        val interpreter = interpreterFactory.createInterpreter(gameState)
-        val rr: GameEffect<GameState> = GameEffect.KillPlayer("You bash yourself on the head with the $target")
-        val rr2: GameEffect<GameState> = GameEffect.KillPlayer("You bash yourself on the head with the $target")
+        val item = gameState.player.inventory.find { it.name == target }
 
-        val mylist: List<GameEffect<GameState>> = listOf(rr, rr2)
-
-        return mylist.map{ Free.liftF(it) }
-                .reduce( { op1, op2 -> op1.flatMap { op2 }}).ev()
-                .foldMap(interpreter, Id.monad()).extract()
+        return if (item == null) gameState.appendDescription("You don't have a $target")
+               else item.effects
+                .map { i -> Free.liftF(i) }
+                .reduce { op1, op2 -> op1.flatMap { op2 } }
+                .foldMap( interpreterFactory.createInterpreter(gameState), Id.monad() )
+                .ev().value
     }
 
 
@@ -118,7 +117,7 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
 class ActionInterpreterFactory() {
     fun createInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {
         return object : FunctionK<GameEffect.F, IdHK> {
-            // Need state construct from Cats
+            // Todo Replace with a state monad? see Cats
             var gs: GameState = gameState.copy()
 
             override fun <A>invoke(fas: HK<GameEffect.F, A>): Id<A> {
@@ -163,7 +162,5 @@ class ActionInterpreterFactory() {
             }
         }
     }
+
 }
-
-
-

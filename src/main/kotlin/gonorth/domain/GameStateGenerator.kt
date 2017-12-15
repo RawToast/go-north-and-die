@@ -1,5 +1,6 @@
 package gonorth.domain
 
+import gonorth.GameEffect
 import gonorth.world.WorldBuilder
 import kategory.Option
 import java.util.*
@@ -11,7 +12,8 @@ interface GameStateGenerator {
 class SimpleGameStateGenerator : GameStateGenerator {
     override fun generate(player: Player, seed:Long): GameState {
         val key = Item("Key", "Shiny key, looks useful",
-                " except for a small golden key")
+                " except for a small golden key",
+                Option.empty(), listOf(GameEffect.Describe("The key is super shiny!")))
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
         val p2 = Location(UUID.randomUUID(), "The path comes to an abrupt end.", emptySet())
@@ -60,7 +62,8 @@ class SimpleGameStateGenerator : GameStateGenerator {
 
 class TinyGameStateGenerator : GameStateGenerator {
     override fun generate(player: Player, seed: Long): GameState {
-        val key = Item("Key", "Shiny key, looks useful", "A key rests on the ground.")
+        val key = Item("Key", "Shiny key, looks useful", "A key rests on the ground.",
+                Option.None, listOf(GameEffect.Describe("The key is super shiny!")))
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", setOf(key))
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())

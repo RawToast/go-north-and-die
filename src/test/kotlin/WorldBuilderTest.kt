@@ -2,6 +2,7 @@ import gonorth.domain.Item
 import gonorth.domain.Location
 import gonorth.domain.Move
 import gonorth.world.WorldBuilder
+import kategory.Option
 import org.junit.Test
 import java.util.*
 import kotlin.test.assertEquals
@@ -52,7 +53,7 @@ class WorldBuilderTest {
     }
 
     @Test fun canAddAnItem() {
-        val item = Item("TestItem", "Test Description", "Testing.")
+        val item = Item("TestItem", "Test Description", "Testing.", Option.None, emptyList())
         val world = worldBuilder.placeItem(p1, item).world
 
         assertTrue(world.locations.size == 1, "Only one location")
