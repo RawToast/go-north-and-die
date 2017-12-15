@@ -63,10 +63,10 @@ class GoNorth(val interpreterFactory: ActionInterpreterFactory) {
     }
 
 
-    private fun use(gameState: GameState, target: String): GameState {
-        val item = gameState.player.inventory.find { it.name == target }
+    fun use(gameState: GameState, target: String): GameState {
+        val item = gameState.player.inventory.find { it.name.equals(target, ignoreCase = true) }
 
-        return if (item == null) gameState.appendDescription("You don't have a $target")
+        return if (item == null) gameState.appendDescription("You do not have a $target")
                else item.effects
                 .map { i -> Free.liftF(i) }
                 .reduce { op1, op2 -> op1.flatMap { op2 } }
@@ -118,10 +118,10 @@ class ActionInterpreterFactory() {
     fun createInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {
         return object : FunctionK<GameEffect.F, IdHK> {
             // Todo Replace with a state monad? see Cats
-            var gs: GameState = gameState.copy()
+            var gs: GameState = gameState.copy(gameText = gameState.gameText.copy(description = gameState.locationOpt().map { it.description }))
 
-            override fun <A>invoke(fas: HK<GameEffect.F, A>): Id<A> {
-                val op = fas.ev()
+            override fun <A>invoke(requestHk: HK<GameEffect.F, A>): Id<A> {
+                val op = requestHk.ev()
 
                 return when (op) {
                     is GameEffect.KillPlayer -> {

@@ -20,7 +20,7 @@ object TestConstants {
 
 
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",
-            Option.None, emptyList())
+            Option.None, listOf(GameEffect.Describe("You try eating the key, it was not tasty.")))
 
     val location1 = Location(startingLocationUUID,
             "You seem to be in a test. You spot some null pointers to the west. {key}" +

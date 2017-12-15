@@ -134,4 +134,24 @@ class GoNorthTest {
         assertEquals(Option.None, newState.findItem("KeY"), "The key is removed")
         assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
     }
+
+    @Test
+    fun canUseAnItem() {
+        assertEquals(Option.Some(TestConstants.key), gameState.findItem("keY"))
+
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
+        val resultState = goNorth.use(newState, "kEy")
+
+        assertFalse(resultState.gameText == newState.gameText)
+    }
+
+    @Test
+    fun cannotUseAnItemThePlayerDoesNotHave() {
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
+        val resultState = goNorth.use(newState, "turnips")
+
+        assertTrue(resultState.gameText != newState.gameText)
+        assertTrue(resultState.gameText.description.nonEmpty())
+        assertTrue(resultState.gameText.description.map { it.contains("You do not have") }.getOrElse { false })
+    }
 }
