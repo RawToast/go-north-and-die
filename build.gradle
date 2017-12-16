@@ -15,13 +15,14 @@ buildscript {
 
 plugins {
     id "com.heroku.sdk.heroku-gradle" version "0.2.0"
+    id "org.jetbrains.kotlin.jvm" version "1.2.10"
 }
 
 
 // Plugins
 apply plugin: 'application'
 apply plugin: 'java'
-apply plugin: 'kotlin'
+
 
 sourceSets {
     main.kotlin.srcDirs += 'src/main/kotlin'
@@ -45,7 +46,10 @@ repositories {
 
 // Dependencies
 dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile 'io.kategory:kategory:0.3.11'
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"

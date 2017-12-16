@@ -122,8 +122,8 @@ class ActionInterpreterFactory() {
             // Todo Replace with a state monad? see Cats
             var gs: GameState = gameState.resetGameText()
 
-            override fun <A> invoke(requestHk: HK<GameEffect.F, A>): Id<A> {
-                val op = requestHk.ev()
+            override fun <A> invoke(fa: HK<GameEffect.F, A>): Id<A> {
+                val op = fa.ev()
 
                 return when (op) {
                     is GameEffect.KillPlayer -> {

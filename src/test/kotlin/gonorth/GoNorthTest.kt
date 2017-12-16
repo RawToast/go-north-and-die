@@ -142,12 +142,6 @@ class GoNorthTest {
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
         val resultState = goNorth.use(newState, "kEy")
 
-        println(gameState.gameText)
-        println("*******")
-        println(newState.gameText)
-        println("*******")
-        println(resultState.gameText)
-
         assertFalse(resultState.gameText == newState.gameText)
     }
 
