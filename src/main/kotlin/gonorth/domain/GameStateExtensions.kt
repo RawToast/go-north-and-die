@@ -36,6 +36,7 @@ fun GameState.addToInventory(item: Item): GameState =
 
 
 // Descriptive
+
 fun GameState.updateTextWithItems(): GameState {
     val items = this.locationOpt()
             .map { it.items }
@@ -58,5 +59,16 @@ fun GameState.appendDescription(textToAppend: String): GameState {
     return this.copy(gameText = this.gameText.copy(description =
     Option(this.gameText.description.map { desc -> desc + "\n" + textToAppend }
             .getOrElse { textToAppend })))
+}
+
+fun GameState.appendPretext(textToAppend: String): GameState {
+    return this.copy(gameText = this.gameText.copy(preText =
+            if (this.gameText.preText.isBlank()) textToAppend
+            else this.gameText.preText + "\n" + textToAppend))
+}
+
+fun GameState.resetGameText(): GameState {
+    return this.copy(gameText = this.gameText.copy(preText = "", description = this.locationOpt().map { it.description }))
+            .updateTextWithItems()
 }
 

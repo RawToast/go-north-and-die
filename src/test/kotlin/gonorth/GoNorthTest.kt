@@ -142,6 +142,12 @@ class GoNorthTest {
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
         val resultState = goNorth.use(newState, "kEy")
 
+        println(gameState.gameText)
+        println("*******")
+        println(newState.gameText)
+        println("*******")
+        println(resultState.gameText)
+
         assertFalse(resultState.gameText == newState.gameText)
     }
 
@@ -152,6 +158,6 @@ class GoNorthTest {
 
         assertTrue(resultState.gameText != newState.gameText)
         assertTrue(resultState.gameText.description.nonEmpty())
-        assertTrue(resultState.gameText.description.map { it.contains("You do not have") }.getOrElse { false })
+        assertTrue(resultState.gameText.preText.contains("You do not have"))
     }
 }
