@@ -10,6 +10,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.adarshr:gradle-test-logger-plugin:1.1.2'
     }
 }
 
@@ -22,16 +23,17 @@ plugins {
 // Plugins
 apply plugin: 'application'
 apply plugin: 'java'
+apply plugin: 'com.adarshr.test-logger'
 
 
-sourceSets {
-    main.kotlin.srcDirs += 'src/main/kotlin'
-    test {
-        kotlin {
-            srcDir "test/main/kotlin"
-        }
-    }
-}
+//sourceSets {
+//    main.kotlin.srcDirs += 'main'
+//    test {
+//        kotlin {
+//            srcDir 'test'
+//        }
+//    }
+//}
 
 mainClassName = 'gonorth.slack.SlackServerKt'
 
@@ -46,6 +48,7 @@ repositories {
 
 // Dependencies
 dependencies {
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
@@ -83,6 +86,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.3'
 }
 
+test {
+    testLogging {
+        outputs.upToDateWhen {false}
+    }
+}
 jar {
     manifest {
         attributes 'Main-Class': 'gonorth.slack.SlackServerKt'
