@@ -43,7 +43,7 @@ class SlackService(private val client: GameClient) {
                                 g.gameText.description.map { it + nl }.getOrElse { empty }
                                 + nl
                                 + mvs
-                                )
+                        )
                     }
                 }
     }

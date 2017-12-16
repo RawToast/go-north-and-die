@@ -1,6 +1,9 @@
 package gonorth
 
-import gonorth.domain.*
+import gonorth.domain.GameState
+import gonorth.domain.GameStateGenerator
+import gonorth.domain.Move
+import gonorth.domain.Player
 import kategory.Option
 import java.util.*
 
@@ -13,10 +16,12 @@ interface GameClient {
 }
 
 
-class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth,
-                       val worldBuilder: GameStateGenerator) : GameClient {
+class SimpleGameClient(private var db: Map<String, GameState>,
+                       private val engine: GoNorth,
+                       private val worldBuilder: GameStateGenerator) : GameClient {
 
     override fun takeInput(userId: String, input: String): Option<GameState> {
+        // Valid requests from Slack are pretty limited:
         // /gnad EAST
         // /gnad DESCRIBE Key
         val moveStr = input.substringBefore(' ')
@@ -29,7 +34,7 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth,
         }
 
 
-        val res = db[userId].toOpt()
+        val result = db[userId].toOpt()
                 .flatMap { gs ->
                     Move.values()
                             .find { m -> m.name.equals(moveStr, ignoreCase = true) }
@@ -37,9 +42,9 @@ class SimpleGameClient(var db: Map<String, GameState>, val engine: GoNorth,
                             .map { engine.takeAction(gs, it, commandOpt)  }
                 }
 
-        db = res.fold( {db}, { db.plus(Pair(userId, it)) })
+        db = result.fold({ db }, { db.plus(Pair(userId, it)) })
 
-        return res
+        return result
     }
 
     override fun startGame(userId: String): GameState {

@@ -15,7 +15,8 @@ class GoNorthTest {
 
     private val KEY: String = "Key"
 
-    private val goNorth = GoNorth()
+    private val factory = ActionInterpreterFactory()
+    private val goNorth = GoNorth(factory)
 
     private val gameState = TestConstants.gameState
 
@@ -132,5 +133,36 @@ class GoNorthTest {
 
         assertEquals(Option.None, newState.findItem("KeY"), "The key is removed")
         assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
+    }
+
+    @Test
+    fun cantTakeAnItemThatDoesNotExit() {
+        assertEquals(Option.None, gameState.findItem("Cat"))
+
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, "Cat".some())
+
+        assertFalse(newState.player.inventory.map { it.name }.contains("Cat"), "The player now has the key")
+        assertTrue (newState.gameText.preText.contains("There is no Cat"))
+    }
+
+
+    @Test
+    fun canUseAnItem() {
+        assertEquals(Option.Some(TestConstants.key), gameState.findItem("keY"))
+
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
+        val resultState = goNorth.use(newState, "kEy")
+
+        assertFalse(resultState.gameText == newState.gameText)
+    }
+
+    @Test
+    fun cannotUseAnItemThePlayerDoesNotHave() {
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
+        val resultState = goNorth.use(newState, "turnips")
+
+        assertTrue(resultState.gameText != newState.gameText)
+        assertTrue(resultState.gameText.description.nonEmpty())
+        assertTrue(resultState.gameText.preText.contains("You do not have"))
     }
 }

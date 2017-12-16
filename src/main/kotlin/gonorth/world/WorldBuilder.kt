@@ -2,6 +2,7 @@ package gonorth.world
 
 import gonorth.domain.*
 import kategory.getOption
+import java.util.*
 
 // gonorth.domain.World data structure and building functions
 
@@ -21,6 +22,20 @@ class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
                 .fold({ setOf(link) }, { l -> l.toSet() })
 
         val newLinks = world.links.plus(Pair(from.id, x))
+
+        return WorldBuilder(World(world.locations, newLinks))
+    }
+
+    fun linkLocation(from: UUID, to: UUID, move: Move, description: String): WorldBuilder {
+
+        val link = Link(to, move, description)
+
+        val x: Set<Link> = world.links.getOption(from)
+                .map { it.filterNot { l -> l.to == to && move == l.move } }
+                .map { it.plus(link) }
+                .fold({ setOf(link) }, { l -> l.toSet() })
+
+        val newLinks = world.links.plus(Pair(from, x))
 
         return WorldBuilder(World(world.locations, newLinks))
     }

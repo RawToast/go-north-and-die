@@ -1,6 +1,7 @@
 package gonorth.slack
 
 import com.fasterxml.jackson.databind.SerializationFeature
+import gonorth.ActionInterpreterFactory
 import gonorth.GoNorth
 import gonorth.SimpleGameClient
 import gonorth.domain.SimpleGameStateGenerator
@@ -34,7 +35,8 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
 
-    val client = SimpleGameClient(kotlin.collections.mapOf(), GoNorth(), SimpleGameStateGenerator())
+    val interpreter = ActionInterpreterFactory()
+    val client = SimpleGameClient(kotlin.collections.mapOf(), GoNorth(interpreter), SimpleGameStateGenerator())
 
     val slackService = SlackService(client)
 
@@ -79,7 +81,7 @@ fun Application.module() {
 
                 val sr = slackService.takeInput(userOpt, textOpt)
 
-                call.respond(sr.getOrElse { SlackResponse("Unprocessable request: ${textOpt.getOrElse { "N/A" }}") })
+                call.respond(sr.getOrElse { SlackResponse("Cannot process request: ${textOpt.getOrElse { "N/A" }}") })
             } else {
                 log.warn("Invalid request " + call.request.contentType()
                         + " " + call.request.headers.toString())
