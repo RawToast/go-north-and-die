@@ -56,9 +56,12 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
                 .getOrElse { gameState }
 
         val descriptionOpt = gsWithItem.locationOpt().map { it.description }
-        val text = GameText("You take the $target", descriptionOpt)
 
-        return gsWithItem.copy(gameText = text)
+        val gsOpt: Option<GameState> = gameState.findItem(target)
+                .map { gameState.removeItem(it.name).addToInventory(it) }
+
+        return gsOpt.map { g -> g.copy(gameText = GameText("You take the $target", descriptionOpt)) }
+                .getOrElse { gsWithItem.copy(gameText = GameText("There is no $target", descriptionOpt)) }
                 .updateTextWithItems()
     }
 

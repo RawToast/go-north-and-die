@@ -136,6 +136,17 @@ class GoNorthTest {
     }
 
     @Test
+    fun cantTakeAnItemThatDoesNotExit() {
+        assertEquals(Option.None, gameState.findItem("Cat"))
+
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, "Cat".some())
+
+        assertFalse(newState.player.inventory.map { it.name }.contains("Cat"), "The player now has the key")
+        assertTrue (newState.gameText.preText.contains("There is no Cat"))
+    }
+
+
+    @Test
     fun canUseAnItem() {
         assertEquals(Option.Some(TestConstants.key), gameState.findItem("keY"))
 
