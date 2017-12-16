@@ -10,7 +10,7 @@ interface GameStateGenerator {
 }
 
 class SimpleGameStateGenerator : GameStateGenerator {
-    override fun generate(player: Player, seed:Long): GameState {
+    override fun generate(player: Player, seed: Long): GameState {
         val key = Item("Key", "Shiny key, looks useful",
                 " except for a small golden key",
                 Option.empty(), listOf(GameEffect.Describe("The key is super shiny!")))
@@ -25,7 +25,6 @@ class SimpleGameStateGenerator : GameStateGenerator {
         val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
         val p7 = Location(UUID.randomUUID(),
                 "You look at the tower door in front of you. Rocks fall, You die.", emptySet())
-
 
 
         val world = WorldBuilder().newLocation(p1)

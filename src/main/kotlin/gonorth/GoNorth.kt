@@ -5,7 +5,7 @@ import gonorth.world.WorldBuilder
 import kategory.*
 import java.util.*
 
-class GoNorth(val interpreterFactory: ActionInterpreterFactory) {
+class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
 
     fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState =
             handleActionWithTarget(move, gameState, command.getOrElse { "" })
@@ -67,10 +67,10 @@ class GoNorth(val interpreterFactory: ActionInterpreterFactory) {
         val item = gameState.player.inventory.find { it.name.equals(target, ignoreCase = true) }
 
         return if (item == null) gameState.appendDescription("You do not have a $target")
-               else item.effects
+        else item.effects
                 .map { i -> Free.liftF(i) }
                 .reduce { op1, op2 -> op1.flatMap { op2 } }
-                .foldMap( interpreterFactory.createInterpreter(gameState), Id.monad() )
+                .foldMap(interpreterFactory.createInterpreter(gameState), Id.monad())
                 .ev().value
     }
 
@@ -88,7 +88,7 @@ fun <A> HK<GameEffect.F, A>.ev(): GameEffect<A> = this as GameEffect<A>
 sealed class GameEffect<out A> : HK<GameEffect.F, A> {
     sealed class F private constructor()
 
-    data class Describe(val text: String): GameEffect<GameState>()
+    data class Describe(val text: String) : GameEffect<GameState>()
     data class KillPlayer(val text: String) : GameEffect<GameState>()
     data class TeleportPlayer(val locationUUID: UUID, val text: String) : GameEffect<GameState>()
     data class OneWayLink(val link: LinkDetails, val text: String) : GameEffect<GameState>()
@@ -120,7 +120,7 @@ class ActionInterpreterFactory() {
             // Todo Replace with a state monad? see Cats
             var gs: GameState = gameState.copy(gameText = gameState.gameText.copy(description = gameState.locationOpt().map { it.description }))
 
-            override fun <A>invoke(requestHk: HK<GameEffect.F, A>): Id<A> {
+            override fun <A> invoke(requestHk: HK<GameEffect.F, A>): Id<A> {
                 val op = requestHk.ev()
 
                 return when (op) {
@@ -134,14 +134,14 @@ class ActionInterpreterFactory() {
                         gs = gs.copy(currentLocation = op.locationUUID)
                         gs = gs.findLocation(op.locationUUID)
                                 .map { it.description }
-                                .fold({gs}, {s -> gs.appendDescription(s)})
+                                .fold({ gs }, { s -> gs.appendDescription(s) })
                         Id.pure(gs)
                     }
                     is GameEffect.OneWayLink -> {
                         gs = gs.appendDescription(op.text)
                         gs = gs.copy(world = WorldBuilder(gs.world)
-                                    .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
-                                    .world)
+                                .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
+                                .world)
                         Id.pure(gs)
                     }
                     is GameEffect.TwoWayLink -> {

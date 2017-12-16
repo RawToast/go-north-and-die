@@ -1,8 +1,11 @@
 package gonorth.slack
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import gonorth.*
+import gonorth.ActionInterpreterFactory
+import gonorth.GoNorth
+import gonorth.SimpleGameClient
 import gonorth.domain.SimpleGameStateGenerator
+import gonorth.toOpt
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -78,7 +81,7 @@ fun Application.module() {
 
                 val sr = slackService.takeInput(userOpt, textOpt)
 
-                call.respond(sr.getOrElse { SlackResponse("Unprocessable request: ${textOpt.getOrElse { "N/A" }}") })
+                call.respond(sr.getOrElse { SlackResponse("Cannot process request: ${textOpt.getOrElse { "N/A" }}") })
             } else {
                 log.warn("Invalid request " + call.request.contentType()
                         + " " + call.request.headers.toString())
