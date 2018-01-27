@@ -1,13 +1,15 @@
 package gonorth.slack
 
-import gonorth.*
+import arrow.core.Option
+import arrow.core.getOrElse
+import gonorth.ActionInterpreterFactory
+import gonorth.GameClient
+import gonorth.GoNorth
+import gonorth.SimpleGameClient
 import gonorth.domain.GameState
 import gonorth.domain.Move
 import gonorth.domain.TinyGameStateGenerator
 import gonorth.domain.location
-import kategory.Option
-import kategory.getOrElse
-import kategory.nonEmpty
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

@@ -1,8 +1,9 @@
 package gonorth.domain
 
+import arrow.core.None
+import arrow.core.Some
 import gonorth.GameEffect
 import gonorth.world.WorldBuilder
-import kategory.Option
 import java.util.*
 
 interface GameStateGenerator {
@@ -23,13 +24,13 @@ class SimpleGameStateGenerator : GameStateGenerator {
 
         val key = Item("Key", "Shiny key, looks useful",
                 " except for a small golden key",
-                Option.Some(doorLocationUUID),
+                Some(doorLocationUUID),
                 listOf(GameEffect.OneWayLink(GameEffect.LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
                         "You open the door walk and enter the tower. The door slams shut behind you. §"),"You unlock the tower door")))
 
         val axe = Item("Axe", "Sharp looking axe",
                 " and a small axe lying next to a pile of firewood",
-                Option.Some(doorLocationUUID), listOf(
+                Some(doorLocationUUID), listOf(
                     GameEffect.Describe("You start hacking away at the wooden door."),
                     GameEffect.Describe("It doesn't take long before the door starts to give way."),
                     GameEffect.KillPlayer("In your eagerness you take one last wild swing at the door and accidentally take off your own head.")
@@ -76,7 +77,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
 
         val startingText = GameText(
                 "You find yourself lost in a dark forest.",
-                Option.Some("It might be wise to find shelter for the night.")
+                Some("It might be wise to find shelter for the night.")
         )
 
         return GameState(startingText, world, p1.id, player, seed)
@@ -86,7 +87,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
 class TinyGameStateGenerator : GameStateGenerator {
     override fun generate(player: Player, seed: Long): GameState {
         val key = Item("Key", "Shiny key, looks useful", "A key rests on the ground.",
-                Option.None, listOf(GameEffect.Describe("The key is super shiny!")))
+                None, listOf(GameEffect.Describe("The key is super shiny!")))
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", setOf(key))
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
@@ -99,7 +100,7 @@ class TinyGameStateGenerator : GameStateGenerator {
 
         val startingText = GameText(
                 "You find yourself lost in a dark forest.",
-                Option.Some("It might be wise to find shelter for the night.")
+                Some("It might be wise to find shelter for the night.")
         )
 
         return GameState(startingText, world, p1.id, player, seed)

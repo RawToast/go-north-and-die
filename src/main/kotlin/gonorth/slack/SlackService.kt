@@ -1,9 +1,9 @@
 package gonorth.slack
 
+import arrow.core.Option
+import arrow.core.getOrElse
 import gonorth.GameClient
 import gonorth.domain.locationOpt
-import kategory.Option
-import kategory.getOrElse
 
 class SlackService(private val client: GameClient) {
 

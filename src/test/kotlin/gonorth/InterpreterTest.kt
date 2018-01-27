@@ -3,9 +3,8 @@ package gonorth
 import gonorth.GameEffect.*
 import gonorth.domain.GameState
 import gonorth.domain.Move
-import gonorth.domain.location
-import gonorth.domain.locationOpt
-import kategory.*
+import arrow.free.*
+import arrow.core.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

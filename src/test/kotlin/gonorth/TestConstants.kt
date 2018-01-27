@@ -1,8 +1,8 @@
 package gonorth
 
+import arrow.core.None
 import gonorth.domain.*
 import gonorth.world.WorldBuilder
-import kategory.Option
 import java.util.*
 
 const val UUID1: String = "b0529be4-8c14-41d3-9283-f8dfb916a9e1"
@@ -20,7 +20,7 @@ object TestConstants {
 
 
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",
-            Option.None, listOf(GameEffect.Describe("You try eating the key, it was not tasty.")))
+            None, listOf(GameEffect.Describe("You try eating the key, it was not tasty.")))
 
     val location1 = Location(startingLocationUUID,
             "You seem to be in a test. You spot some null pointers to the west. {key}" +
@@ -30,7 +30,7 @@ object TestConstants {
     val location4 = Location(location4UUID, "Secret Location", emptySet())
 
     private val gameText = GameText("You venture into a dark dungeon",
-            Option.None)
+            None)
     val player = Player(1000, emptySet(), alive = true)
 
     private val builder = WorldBuilder().newLocation(location1)
@@ -41,7 +41,7 @@ object TestConstants {
             .twoWayLink(location1, location3,
                     Move.EAST, Move.WEST, "You head east...", "You stroll west")
             .placeItem(location1, Item("Key", "It's a shiny golden key.",
-                    "A key rests on the ground.", Option.None, emptyList()))
+                    "A key rests on the ground.", None, emptyList()))
 
     val world = builder.world
 

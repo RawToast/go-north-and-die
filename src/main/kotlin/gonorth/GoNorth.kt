@@ -1,8 +1,15 @@
 package gonorth
 
+import arrow.HK
+import arrow.core.*
+import arrow.free.Free
+import arrow.free.flatMap
+import arrow.free.foldMap
+import arrow.free.instances.FreeMonadInstance
+import arrow.syntax.option.some
+import arrow.syntax.option.toOption
 import gonorth.domain.*
 import gonorth.world.WorldBuilder
-import kategory.*
 import java.util.*
 
 class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
@@ -24,7 +31,7 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
     private fun handleMovement(gameState: GameState, move: Move): Option<GameState> {
         val linkToNewLocation: Option<Link> = gameState.locationOpt()
                 .flatMap { gameState.fetchLinks(it.id) }
-                .flatMap { it.find { it.move == move }.toOpt() }
+                .flatMap { it.find { it.move == move }.toOption() }
 
         val newPlace = linkToNewLocation.flatMap { l ->
             gameState.findLocation(l.to)
@@ -41,8 +48,13 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
     }
 
     private fun describe(gameState: GameState, target: String): GameState {
-        val item = gameState.findItem(target)
-                .map { it.description }
+        val item = gameState.findUsable(target)
+                .map {
+                    when (it) {
+                        is Item -> it.description
+                        is FixedItem -> it.description
+                    }
+                }
                 .getOrElse { "There is no $target" }
                 .some()
 
@@ -73,7 +85,7 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
 
         return if (item == null) resetGameState.appendPretext("You do not have a $target")
         else item.effects
-                .map { i -> Free.liftF(i) }
+                .map { Free.liftF(it) }
                 .reduce { op1, op2 -> op1.flatMap { op2 } }
                 .foldMap(interpreterFactory.createInterpreter(resetGameState), Id.monad())
                 .ev().value
@@ -101,7 +113,7 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
 
     data class LinkDetails(val from: UUID, val to: UUID, val move: Move, val description: String)
 
-    companion object : FreeMonadInstance<GameEffect.F> {
+    companion object : FreeMonadInstance<F> {
         fun describe(text: String): Free<GameEffect.F, GameState> =
                 Free.liftF(Describe(text))
 

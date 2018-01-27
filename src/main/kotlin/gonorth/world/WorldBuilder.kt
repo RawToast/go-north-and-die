@@ -1,7 +1,7 @@
 package gonorth.world
 
 import gonorth.domain.*
-import kategory.getOption
+import arrow.data.getOption
 import java.util.*
 
 // gonorth.domain.World data structure and building functions
