@@ -1,10 +1,10 @@
 package gonorth.domain
 
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.getOrElse
 import gonorth.TestConstants
 import gonorth.world.WorldBuilder
-import kategory.Option
-import kategory.getOrElse
-import kategory.nonEmpty
 import org.junit.Test
 import kotlin.test.*
 
@@ -53,41 +53,45 @@ class GameStateExtensionsTest {
         assertTrue(locationOpt.nonEmpty())
         assertTrue(locationOpt2.nonEmpty())
 
-        assertTrue(locationOpt.map{ it.id == TestConstants.location2UUID}.getOrElse{false})
-        assertTrue(locationOpt2.map{ it.id == TestConstants.location3UUID}.getOrElse{false})
+        assertTrue(locationOpt.map { it.id == TestConstants.location2UUID }.getOrElse { false })
+        assertTrue(locationOpt2.map { it.id == TestConstants.location3UUID }.getOrElse { false })
     }
 
-    @Test fun findNothingWhenTheUUIDDoesNotExist() {
+    @Test
+    fun findNothingWhenTheUUIDDoesNotExist() {
         val locationOpt = gameStateWithEmptyWorld.findLocation(TestConstants.location2UUID)
         val locationOpt2 = gameStateWithEmptyWorld.findLocation(TestConstants.location3UUID)
 
-        assertTrue(locationOpt.isEmpty)
-        assertTrue(locationOpt2.isEmpty)
+        assertTrue(locationOpt.isEmpty())
+        assertTrue(locationOpt2.isEmpty())
     }
 
-    @Test fun canRemoveAnItemFromALocation() {
+    @Test
+    fun canRemoveAnItemFromALocation() {
 
         val newState = gameState.removeItem("Key")
 
-        assertEquals(Option.Some(TestConstants.key), gameState.findItem("Key"))
-        assertEquals(Option.None, newState.findItem("Key"))
+        assertEquals(Some(TestConstants.key), gameState.findItem("Key"))
+        assertEquals(None, newState.findItem("Key"))
     }
 
-    @Test fun canPlaceAnItemInThePlayersInventory() {
+    @Test
+    fun canPlaceAnItemInThePlayersInventory() {
         val test = "Test"
-        val item = Item(test, test, test, Option.None, emptyList())
-        val newState:GameState = gameState.addToInventory(item)
+        val item = Item(test, test, test, None, emptyList())
+        val newState: GameState = gameState.addToInventory(item)
 
-        assertNotNull(newState.player.inventory.firstOrNull{it.name == test})
-        assertNull(gameState.player.inventory.firstOrNull{it.name == test})
+        assertNotNull(newState.player.inventory.firstOrNull { it.name == test })
+        assertNull(gameState.player.inventory.firstOrNull { it.name == test })
     }
 
-    @Test fun canIncludeItemsWithinTheDescription() {
+    @Test
+    fun canIncludeItemsWithinTheDescription() {
         val gameStateWithDescription = gameState.copy(
                 gameText = GameText("Pre is irrelevant",
-                        description = Option.Some(TestConstants.location1.description)))
+                        description = Some(TestConstants.location1.description)))
 
-        val newState:GameState = gameStateWithDescription.updateTextWithItems()
+        val newState: GameState = gameStateWithDescription.updateTextWithItems()
 
         assertNotNull(newState.gameText.preText)
         assertTrue(gameStateWithDescription.gameText.description.nonEmpty(), "Should have description")
@@ -99,13 +103,14 @@ class GameStateExtensionsTest {
         assertTrue(description.contains("A shiny key is on the floor."))
     }
 
-    @Test fun willRemoveAnyUnmatchedItems() {
+    @Test
+    fun willRemoveAnyUnmatchedItems() {
         val gameStateWithDescription = gameState.copy(
                 gameText = GameText("Pre is irrelevant",
-                        description = Option.Some("There is a table apples, {fork}and some shoes")))
+                        description = Some("There is a table apples, {fork}and some shoes")))
 
 
-        val newState:GameState = gameStateWithDescription.updateTextWithItems()
+        val newState: GameState = gameStateWithDescription.updateTextWithItems()
 
         assertNotNull(newState.gameText.preText)
         assertTrue(gameStateWithDescription.gameText.description.nonEmpty(), "Should have description")
@@ -118,21 +123,24 @@ class GameStateExtensionsTest {
         assertEquals("There is a table apples, and some shoes", newDescription)
     }
 
-    @Test fun canAppendTextToTheDescription() {
+    @Test
+    fun canAppendTextToTheDescription() {
         val textToAppend = "Text to append"
         val gameStateWithDescription = gameState.copy(
                 gameText = GameText("Pre is irrelevant",
-                        description = Option.Some(TestConstants.location1.description)))
+                        description = Some(TestConstants.location1.description)))
         val newState = gameStateWithDescription.appendDescription(textToAppend)
 
         assertTrue(newState.gameText.description.map { it.contains(textToAppend) }.getOrElse { false })
         assertTrue(newState.gameText.description.map { it.contains("\n") }.getOrElse { false })
         assertTrue(newState.gameText.description.map {
-            it.contains(TestConstants.location1.description) }.getOrElse { false })
+            it.contains(TestConstants.location1.description)
+        }.getOrElse { false })
 
     }
 
-    @Test fun canAppendTextWhenTheDescriptionDoesNotExist() {
+    @Test
+    fun canAppendTextWhenTheDescriptionDoesNotExist() {
         val textToAppend = "Text to append"
 
         val newState = gameState.appendDescription(textToAppend)

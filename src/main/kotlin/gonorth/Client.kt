@@ -1,10 +1,13 @@
 package gonorth
 
+import arrow.core.None
 import gonorth.domain.GameState
 import gonorth.domain.GameStateGenerator
 import gonorth.domain.Move
 import gonorth.domain.Player
-import kategory.Option
+import arrow.core.Option
+import arrow.core.Some
+import arrow.syntax.option.toOption
 import java.util.*
 
 interface GameClient {
@@ -28,17 +31,17 @@ class SimpleGameClient(private var db: Map<String, GameState>,
         val command = input.substringAfter(" ")
 
         val commandOpt = if (command == moveStr) {
-            Option.None
+            None
         } else {
-            Option.Some(command)
+            Some(command)
         }
 
 
-        val result = db[userId].toOpt()
+        val result = db[userId].toOption()
                 .flatMap { gs ->
                     Move.values()
                             .find { m -> m.name.equals(moveStr, ignoreCase = true) }
-                            .toOpt()
+                            .toOption()
                             .map { engine.takeAction(gs, it, commandOpt)  }
                 }
 

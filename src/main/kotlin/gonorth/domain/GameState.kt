@@ -1,7 +1,7 @@
 package gonorth.domain
 
 import gonorth.GameEffect
-import kategory.Option
+import arrow.core.Option
 import java.util.*
 
 data class GameState(val gameText: GameText, val world: World, val currentLocation: UUID,
@@ -10,10 +10,15 @@ data class GameState(val gameText: GameText, val world: World, val currentLocati
 data class GameText(val preText: String, val description: Option<String>)
 
 data class World(val locations: Set<Location>, val links: Map<UUID, Set<Link>>)
-data class Location(val id: UUID, val description: String, val items: Set<Item>)
+data class Location(val id: UUID, val description: String, val items: Set<Useable>)
 data class Link(val to: UUID, val move: Move, val description: String)
 
-data class Item(val name: String, val description: String, val ingameText: String, val requiredLocation: Option<UUID>, val effects: List<GameEffect<GameState>>)
+sealed class Useable
+data class Item(val name: String, val description: String, val ingameText: String,
+                val requiredLocation: Option<UUID>, val effects: List<GameEffect<GameState>>): Useable()
+data class FixedItem(val name: String, val description: String, val ingameText: String,
+                     val effects: List<GameEffect<GameState>>): Useable()
+
 
 data class Player(val hunger: Int, val inventory: Set<Item>, val alive:Boolean)
 

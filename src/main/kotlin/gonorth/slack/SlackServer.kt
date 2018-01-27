@@ -1,11 +1,13 @@
 package gonorth.slack
 
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.syntax.option.toOption
 import com.fasterxml.jackson.databind.SerializationFeature
 import gonorth.ActionInterpreterFactory
 import gonorth.GoNorth
 import gonorth.SimpleGameClient
 import gonorth.domain.SimpleGameStateGenerator
-import gonorth.toOpt
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -25,11 +27,9 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import kategory.Option
-import kategory.getOrElse
 
 fun main(args: Array<String>) {
-    val port: Int = System.getenv("PORT").toOpt().map { Integer.valueOf(it) }.getOrElse { 8080 }
+    val port: Int = System.getenv("PORT").toOption().map { Integer.valueOf(it) }.getOrElse { 8080 }
     embeddedServer(Netty, port, watchPaths = listOf("SlackServerKt"), module = Application::module).start()
 }
 
@@ -56,7 +56,7 @@ fun Application.module() {
             if (call.request.contentType() == ContentType.Application.FormUrlEncoded) {
                 val formData = call.receiveParameters()
 
-                val userOpt: Option<String> = formData["user_id"].toOpt()
+                val userOpt: Option<String> = formData["user_id"].toOption()
 
                 val sr = slackService.createGame(userOpt)
 
@@ -76,8 +76,8 @@ fun Application.module() {
             if (call.request.contentType() == ContentType.Application.FormUrlEncoded) {
                 val formData = call.receiveParameters()
 
-                val userOpt: Option<String> = formData["user_id"].toOpt()
-                val textOpt: Option<String> = formData["text"].toOpt()
+                val userOpt: Option<String> = formData["user_id"].toOption()
+                val textOpt: Option<String> = formData["text"].toOption()
 
                 val sr = slackService.takeInput(userOpt, textOpt)
 

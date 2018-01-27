@@ -1,11 +1,13 @@
 package gonorth
 
-import gonorth.domain.*
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.getOrElse
+import arrow.syntax.option.some
 import gonorth.domain.Move.*
-import kategory.Option
-import kategory.getOrElse
-import kategory.nonEmpty
-import kategory.some
+import gonorth.domain.SimpleGameStateGenerator
+import gonorth.domain.findItem
+import gonorth.domain.location
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -28,7 +30,7 @@ class GoNorthTest {
 
     @Test
     fun whenGivenNorthThePlayerDies() {
-        val newState = goNorth.takeAction(gameState, NORTH, Option.None)
+        val newState = goNorth.takeAction(gameState, NORTH, None)
 
         assertEquals("You stumble ahead", newState.gameText.preText)
         assertTrue(newState.location()?.description.orEmpty().contains("You went north and died"))
@@ -40,7 +42,7 @@ class GoNorthTest {
     fun whenGivenNorthWithTheRealMapThePlayerDies() {
         val stateWithRealWorld = SimpleGameStateGenerator()
                 .generate(TestConstants.player, 123L)
-        val newState = goNorth.takeAction(stateWithRealWorld, NORTH, Option.None)
+        val newState = goNorth.takeAction(stateWithRealWorld, NORTH, None)
 
         assertEquals("You stumble ahead", newState.gameText.preText)
         assertTrue(newState.location()?.description.orEmpty().contains("You went north and died"))
@@ -50,7 +52,7 @@ class GoNorthTest {
 
     @Test
     fun whenGivenEastThePlayerWins() {
-        val newState = goNorth.takeAction(gameState, EAST, Option.None)
+        val newState = goNorth.takeAction(gameState, EAST, None)
 
         assertEquals("You head east...", newState.gameText.preText)
 
@@ -62,8 +64,8 @@ class GoNorthTest {
 
     @Test
     fun whenGivenADirectionThatDoesNotExist() {
-        val newState = goNorth.takeAction(gameState, SOUTH, Option.None)
-        val newState2 = goNorth.takeAction(gameState, WEST, Option.None)
+        val newState = goNorth.takeAction(gameState, SOUTH, None)
+        val newState2 = goNorth.takeAction(gameState, WEST, None)
 
         assertEquals(gameState.gameText.preText, newState.gameText.preText)
         assertEquals(gameState.gameText.description, newState.gameText.description)
@@ -74,7 +76,7 @@ class GoNorthTest {
 
     @Test
     fun whenGivenAMovementAnyCommandsAreIgnored() {
-        val newState = goNorth.takeAction(gameState, EAST, Option.None)
+        val newState = goNorth.takeAction(gameState, EAST, None)
         val newStateAfterCommand = goNorth.takeAction(gameState, EAST, "Dance".some())
 
         assertEquals(newState, newStateAfterCommand)
@@ -86,7 +88,7 @@ class GoNorthTest {
 
         assertEquals("You take a closer look.", newState.gameText.preText)
 
-        assertEquals("It's a shiny golden key.", newState.gameText.description.getOrElse{""})
+        assertEquals("It's a shiny golden key.", newState.gameText.description.getOrElse { "" })
         assertTrue(newState.world.links.containsKey(newState.location()?.id))
     }
 
@@ -96,7 +98,7 @@ class GoNorthTest {
 
         assertEquals("You take a closer look.", newState.gameText.preText)
 
-        assertEquals("It's a shiny golden key.", newState.gameText.description.getOrElse{""})
+        assertEquals("It's a shiny golden key.", newState.gameText.description.getOrElse { "" })
         assertTrue(newState.world.links.containsKey(newState.location()?.id))
     }
 
@@ -112,12 +114,12 @@ class GoNorthTest {
 
     @Test
     fun canTakeAnItemWhichRemovesItFromTheLocationAndAddsItToTheInventory() {
-        assertEquals(Option.Some(TestConstants.key), gameState.findItem(KEY))
+        assertEquals(Some(TestConstants.key), gameState.findItem(KEY))
 
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
         val newDescription = newState.gameText.description.getOrElse { "" }
 
-        assertEquals(Option.None, newState.findItem(KEY), "The key is removed")
+        assertEquals(None, newState.findItem(KEY), "The key is removed")
         assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
         assertTrue(newState.gameText.description.nonEmpty())
         assertFalse(newDescription.contains("key", ignoreCase = true))
@@ -127,28 +129,28 @@ class GoNorthTest {
 
     @Test
     fun canTakeAnItemIgnoresCase() {
-        assertEquals(Option.Some(TestConstants.key), gameState.findItem("keY"))
+        assertEquals(Some(TestConstants.key), gameState.findItem("keY"))
 
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
 
-        assertEquals(Option.None, newState.findItem("KeY"), "The key is removed")
+        assertEquals(None, newState.findItem("KeY"), "The key is removed")
         assertTrue(newState.player.inventory.contains(TestConstants.key), "The player now has the key")
     }
 
     @Test
     fun cantTakeAnItemThatDoesNotExit() {
-        assertEquals(Option.None, gameState.findItem("Cat"))
+        assertEquals(None, gameState.findItem("Cat"))
 
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, "Cat".some())
 
         assertFalse(newState.player.inventory.map { it.name }.contains("Cat"), "The player now has the key")
-        assertTrue (newState.gameText.preText.contains("There is no Cat"))
+        assertTrue(newState.gameText.preText.contains("There is no Cat"))
     }
 
 
     @Test
     fun canUseAnItem() {
-        assertEquals(Option.Some(TestConstants.key), gameState.findItem("keY"))
+        assertEquals(Some(TestConstants.key), gameState.findItem("keY"))
 
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
         val resultState = goNorth.use(newState, "kEy")
