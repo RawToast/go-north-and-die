@@ -10,7 +10,7 @@ To start a local server on port 8080 run `gradle run`
 
 ## Tech stack:
 
-* Ktor
-* Kategory
+* [Arrow](https://github.com/arrow-kt/arrow)
+* [Ktor](https://github.com/ktorio/ktor)
 * Jackson
 * Gradle
