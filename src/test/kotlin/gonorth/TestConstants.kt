@@ -2,6 +2,7 @@ package gonorth
 
 import arrow.core.None
 import gonorth.domain.*
+import gonorth.free.GameEffect
 import gonorth.world.WorldBuilder
 import java.util.*
 
