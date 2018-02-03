@@ -2,6 +2,10 @@ package gonorth
 
 import arrow.HK
 import arrow.core.*
+import arrow.data.StateTKindPartial
+import arrow.effects.IO
+import arrow.effects.IOHK
+import arrow.effects.effect
 import arrow.free.Free
 import arrow.free.flatMap
 import arrow.free.foldMap
@@ -33,9 +37,8 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
                 .flatMap { gameState.fetchLinks(it.id) }
                 .flatMap { it.find { it.move == move }.toOption() }
 
-        val newPlace = linkToNewLocation.flatMap { l ->
-            gameState.findLocation(l.to)
-        }
+        val newPlace = linkToNewLocation
+                .flatMap { gameState.findLocation(it.to) }
                 .map { it.description }
 
         return linkToNewLocation
@@ -87,7 +90,7 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
         else item.effects
                 .map { Free.liftF(it) }
                 .reduce { op1, op2 -> op1.flatMap { op2 } }
-                .foldMap(interpreterFactory.createInterpreter(resetGameState), Id.monad())
+                .foldMap(interpreterFactory.createImpureInterpreter(resetGameState), Id.monad())
                 .ev().value
     }
 
@@ -132,7 +135,7 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
 }
 
 class ActionInterpreterFactory() {
-    fun createInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {
+    fun createImpureInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {
         return object : FunctionK<GameEffect.F, IdHK> {
             // Todo Replace with a state monad? see Cats
             var gs: GameState = gameState.resetGameText()
@@ -179,5 +182,4 @@ class ActionInterpreterFactory() {
             }
         }
     }
-
 }

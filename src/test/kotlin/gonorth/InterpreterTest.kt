@@ -17,7 +17,7 @@ class ActionInterpreterTest {
 
     @Test
     fun canIncludeADescription() {
-        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val interpreter = actionInterpreter.createImpureInterpreter(gameState)
         val effect= GameEffect.describe("Something happens")
 
         val result = effect.foldMap(interpreter, Id.monad())
@@ -28,7 +28,7 @@ class ActionInterpreterTest {
 
     @Test
     fun canCompleteMultipleActions() {
-        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val interpreter = actionInterpreter.createImpureInterpreter(gameState)
         val effect1= GameEffect.describe("Something happens")
         val effect2= GameEffect.describe("And then something else!")
         val effect3= GameEffect.describe("And then something moar!!!")
@@ -50,7 +50,7 @@ class ActionInterpreterTest {
 
     @Test
     fun canChangeThePlayersLocation() {
-        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val interpreter = actionInterpreter.createImpureInterpreter(gameState)
         val effect= GameEffect.teleportPlayer(TestConstants.location2UUID ,"You are teleported")
 
         val result = effect.foldMap(interpreter, Id.monad())
@@ -63,7 +63,7 @@ class ActionInterpreterTest {
 
     @Test
     fun canCreateALinkToAnotherLocation() {
-        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val interpreter = actionInterpreter.createImpureInterpreter(gameState)
         val effect= GameEffect.createOneWayLink(
                 LinkDetails(TestConstants.startingLocationUUID, TestConstants.location4UUID,
                         Move.SOUTH, "You walk through the portal"), "A portal appears to the south")
@@ -80,7 +80,7 @@ class ActionInterpreterTest {
 
     @Test
     fun canCreateATwoWayLinkToAnotherLocation() {
-        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val interpreter = actionInterpreter.createImpureInterpreter(gameState)
         val effect= GameEffect.createTwoWayLink(
                 LinkDetails(TestConstants.startingLocationUUID, TestConstants.location4UUID,
                         Move.SOUTH, "You walk through the portal"),
@@ -102,7 +102,7 @@ class ActionInterpreterTest {
 
     @Test
     fun canKillThePlayer() {
-        val interpreter = actionInterpreter.createInterpreter(gameState)
+        val interpreter = actionInterpreter.createImpureInterpreter(gameState)
         val effect= GameEffect.killThePlayer("You explode")
 
         val result = effect.foldMap(interpreter, Id.monad())

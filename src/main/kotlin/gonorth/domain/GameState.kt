@@ -14,8 +14,9 @@ data class Location(val id: UUID, val description: String, val items: Set<Useabl
 data class Link(val to: UUID, val move: Move, val description: String)
 
 sealed class Useable
+typealias ItemEffect = GameEffect<GameState>
 data class Item(val name: String, val description: String, val ingameText: String,
-                val requiredLocation: Option<UUID>, val effects: List<GameEffect<GameState>>): Useable()
+                val requiredLocation: Option<UUID>, val effects: List<ItemEffect>): Useable()
 data class FixedItem(val name: String, val description: String, val ingameText: String,
                      val effects: List<GameEffect<GameState>>): Useable()
 
