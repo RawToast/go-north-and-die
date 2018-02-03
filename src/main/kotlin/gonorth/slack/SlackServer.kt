@@ -4,10 +4,10 @@ import arrow.core.Option
 import arrow.core.getOrElse
 import arrow.syntax.option.toOption
 import com.fasterxml.jackson.databind.SerializationFeature
-import gonorth.ActionInterpreterFactory
 import gonorth.GoNorth
 import gonorth.SimpleGameClient
 import gonorth.domain.SimpleGameStateGenerator
+import gonorth.free.InterpreterFactory
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
 
-    val interpreter = ActionInterpreterFactory()
+    val interpreter = InterpreterFactory()
     val client = SimpleGameClient(kotlin.collections.mapOf(), GoNorth(interpreter), SimpleGameStateGenerator())
 
     val slackService = SlackService(client)

@@ -1,7 +1,7 @@
 package gonorth.domain
 
-import gonorth.GameEffect
 import arrow.core.Option
+import gonorth.free.GameEffect
 import java.util.*
 
 data class GameState(val gameText: GameText, val world: World, val currentLocation: UUID,

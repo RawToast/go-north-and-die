@@ -2,7 +2,6 @@ package gonorth.slack
 
 import arrow.core.Option
 import arrow.core.getOrElse
-import gonorth.ActionInterpreterFactory
 import gonorth.GameClient
 import gonorth.GoNorth
 import gonorth.SimpleGameClient
@@ -10,6 +9,7 @@ import gonorth.domain.GameState
 import gonorth.domain.Move
 import gonorth.domain.TinyGameStateGenerator
 import gonorth.domain.location
+import gonorth.free.InterpreterFactory
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 
 
 class SimpleGameClientTest {
-    private val factory = ActionInterpreterFactory()
+    private val factory = InterpreterFactory()
     val goNorth = GoNorth(factory)
     val gameClient: GameClient = SimpleGameClient(emptyMap(), goNorth, TinyGameStateGenerator())
 

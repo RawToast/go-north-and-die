@@ -1,22 +1,15 @@
 package gonorth
 
-import arrow.HK
 import arrow.core.*
-import arrow.data.StateTKindPartial
-import arrow.effects.IO
-import arrow.effects.IOHK
-import arrow.effects.effect
 import arrow.free.Free
 import arrow.free.flatMap
 import arrow.free.foldMap
-import arrow.free.instances.FreeMonadInstance
 import arrow.syntax.option.some
 import arrow.syntax.option.toOption
 import gonorth.domain.*
-import gonorth.world.WorldBuilder
-import java.util.*
+import gonorth.free.InterpreterFactory
 
-class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
+class GoNorth(private val interpreterFactory: InterpreterFactory) {
 
     fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState =
             handleActionWithTarget(move, gameState, command.getOrElse { "" })
@@ -90,7 +83,7 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
         else item.effects
                 .map { Free.liftF(it) }
                 .reduce { op1, op2 -> op1.flatMap { op2 } }
-                .foldMap(interpreterFactory.createImpureInterpreter(resetGameState), Id.monad())
+                .foldMap(interpreterFactory.impureGameEffectInterpreter(resetGameState), Id.monad())
                 .ev().value
     }
 
@@ -99,87 +92,4 @@ class GoNorth(private val interpreterFactory: ActionInterpreterFactory) {
         return gameState
     }
 
-}
-
-typealias FreeEffect = Free<GameEffect.F, GameState>
-fun <A> HK<GameEffect.F, A>.ev(): GameEffect<A> = this as GameEffect<A>
-
-// Free the monads!
-sealed class GameEffect<out A> : HK<GameEffect.F, A> {
-    sealed class F private constructor()
-
-    data class Describe(val text: String) : GameEffect<GameState>()
-    data class KillPlayer(val text: String) : GameEffect<GameState>()
-    data class TeleportPlayer(val locationUUID: UUID, val text: String) : GameEffect<GameState>()
-    data class OneWayLink(val link: LinkDetails, val text: String) : GameEffect<GameState>()
-    data class TwoWayLink(val link: LinkDetails, val returnLink: LinkDetails, val text: String) : GameEffect<GameState>()
-
-    data class LinkDetails(val from: UUID, val to: UUID, val move: Move, val description: String)
-
-    companion object : FreeMonadInstance<F> {
-        fun describe(text: String): Free<GameEffect.F, GameState> =
-                Free.liftF(Describe(text))
-
-        fun createOneWayLink(link: LinkDetails, text: String): FreeEffect =
-                Free.liftF(OneWayLink(link, text))
-
-        fun createTwoWayLink(link: LinkDetails, returnLink: LinkDetails, text: String): FreeEffect =
-                Free.liftF(TwoWayLink(link, returnLink, text))
-
-        fun killThePlayer(text: String): FreeEffect =
-                Free.liftF(KillPlayer(text))
-
-        fun teleportPlayer(locationUUID: UUID, text: String): FreeEffect =
-                Free.liftF(TeleportPlayer(locationUUID, text))
-    }
-}
-
-class ActionInterpreterFactory() {
-    fun createImpureInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {
-        return object : FunctionK<GameEffect.F, IdHK> {
-            // Todo Replace with a state monad? see Cats
-            var gs: GameState = gameState.resetGameText()
-
-            override fun <A> invoke(fa: HK<GameEffect.F, A>): Id<A> {
-                val op = fa.ev()
-
-                return when (op) {
-                    is GameEffect.KillPlayer -> {
-                        gs = gs.appendDescription(op.text)
-                        gs = gs.copy(player = gs.player.copy(alive = false))
-                        Id.pure(gs)
-                    }
-                    is GameEffect.TeleportPlayer -> {
-                        gs = gs.appendDescription(op.text)
-                        gs = gs.copy(currentLocation = op.locationUUID)
-                        gs = gs.findLocation(op.locationUUID)
-                                .map { it.description }
-                                .fold({ gs }, { s -> gs.appendDescription(s) })
-                        Id.pure(gs)
-                    }
-                    is GameEffect.OneWayLink -> {
-                        gs = gs.appendDescription(op.text)
-                        gs = gs.copy(world = WorldBuilder(gs.world)
-                                .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
-                                .world)
-                        Id.pure(gs)
-                    }
-                    is GameEffect.TwoWayLink -> {
-                        gs = gs.appendDescription(op.text)
-                        gs = gs.copy(world = WorldBuilder(gs.world)
-                                .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
-                                .world)
-                        gs = gs.copy(world = WorldBuilder(gs.world)
-                                .linkLocation(op.returnLink.from, op.returnLink.to, op.returnLink.move, op.returnLink.description)
-                                .world)
-                        Id.pure(gs)
-                    }
-                    is GameEffect.Describe -> {
-                        gs = gs.appendDescription(op.text)
-                        Id.pure(gs)
-                    }
-                } as Id<A>
-            }
-        }
-    }
 }

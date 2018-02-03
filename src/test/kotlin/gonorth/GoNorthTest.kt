@@ -8,6 +8,7 @@ import gonorth.domain.Move.*
 import gonorth.domain.SimpleGameStateGenerator
 import gonorth.domain.findItem
 import gonorth.domain.location
+import gonorth.free.InterpreterFactory
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -17,7 +18,7 @@ class GoNorthTest {
 
     private val KEY: String = "Key"
 
-    private val factory = ActionInterpreterFactory()
+    private val factory = InterpreterFactory()
     private val goNorth = GoNorth(factory)
 
     private val gameState = TestConstants.gameState
