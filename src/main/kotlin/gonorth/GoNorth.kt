@@ -11,8 +11,13 @@ import gonorth.free.InterpreterFactory
 
 class GoNorth(private val interpreterFactory: InterpreterFactory) {
 
-    fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState =
+    fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState {
+        return if (gameState.player.alive) {
             handleActionWithTarget(move, gameState, command.getOrElse { "" })
+        } else {
+            gameState
+        }
+    }
 
     private fun handleActionWithTarget(move: Move, gameState: GameState, target: String): GameState = when (move) {
         Move.NORTH -> handleMovement(gameState, move).getOrElse { gameState }

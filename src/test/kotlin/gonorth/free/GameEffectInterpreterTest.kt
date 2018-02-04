@@ -14,10 +14,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ActionInterpreterTest {
+class GameEffectInterpreterTest {
 
-    val actionInterpreter = InterpreterFactory()
-    val gameState = TestConstants.gameState
+    private val actionInterpreter = InterpreterFactory()
+    private val gameState = TestConstants.gameState
 
     @Test
     fun canIncludeADescription() {
@@ -114,5 +114,52 @@ class ActionInterpreterTest {
 
         assertTrue { result.gameText.description.exists { it.contains("You explode") } }
         assertFalse { result.player.alive }
+    }
+
+    @Test
+    fun canMakeThePlayerHungry() {
+        val interpreter = actionInterpreter.impureGameEffectInterpreter(gameState)
+        val effect = GameEffect.increaseHunger(10)
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.player.hunger < gameState.player.hunger }
+    }
+
+    @Test
+    fun canKillThePlayerUsingHunger() {
+        val interpreter = actionInterpreter.impureGameEffectInterpreter(gameState)
+        val effect = GameEffect.increaseHunger(10000)
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.player.hunger < gameState.player.hunger }
+        assertTrue { result.player.hunger <= 0 }
+        assertFalse { result.player.alive }
+    }
+
+    @Test
+    fun canSatiateThePlayer() {
+        val interpreter = actionInterpreter.impureGameEffectInterpreter(gameState)
+        val effect = GameEffect.reduceHunger(10)
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.player.hunger > gameState.player.hunger }
+    }
+
+    @Test
+    fun cannotSatiateThePlayerOverTheLimit() {
+        val interpreter = actionInterpreter.impureGameEffectInterpreter(gameState)
+        val effect = GameEffect.reduceHunger(10000)
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.player.hunger > gameState.player.hunger }
+        assertTrue { result.player.hunger == 1000 }
     }
 }

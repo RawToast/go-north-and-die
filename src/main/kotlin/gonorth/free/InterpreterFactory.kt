@@ -55,6 +55,16 @@ class InterpreterFactory() {
                         gs = gs.appendDescription(op.text)
                         Id.pure(gs)
                     }
+                    is GameEffect.IncreaseHunger -> {
+                        val newHunger = gs.player.hunger - op.amount
+                        gs = gs.copy(player = gs.player.copy(hunger = newHunger, alive = newHunger > 0))
+
+                        Id.pure(gs)
+                    }
+                    is GameEffect.ReduceHunger -> {
+                        gs = gs.copy(player = gs.player.copy(hunger = Math.min(1000, gs.player.hunger + op.amount)))
+                        Id.pure(gs)
+                    }
                 } as Id<A>
             }
         }
