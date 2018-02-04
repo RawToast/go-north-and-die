@@ -20,6 +20,9 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
     data class OneWayLink(val link: LinkDetails, val text: String) : GameEffect<GameState>()
     data class TwoWayLink(val link: LinkDetails, val returnLink: LinkDetails, val text: String) : GameEffect<GameState>()
 
+    data class IncreaseHunger(val amount: Int) : GameEffect<GameState>()
+    data class ReduceHunger(val amount: Int) : GameEffect<GameState>()
+
     data class LinkDetails(val from: UUID, val to: UUID, val move: Move, val description: String)
 
     companion object : FreeMonadInstance<F> {
@@ -37,5 +40,11 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
 
         fun teleportPlayer(locationUUID: UUID, text: String): FreeEffect =
                 Free.liftF(TeleportPlayer(locationUUID, text))
+
+        fun increaseHunger(amount: Int): FreeEffect =
+                Free.liftF(IncreaseHunger(amount))
+
+        fun reduceHunger(amount: Int): FreeEffect =
+                Free.liftF(ReduceHunger(amount))
     }
 }
