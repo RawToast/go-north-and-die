@@ -92,7 +92,7 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
 
         val resetGameState = gameState.resetGameText()
 
-            return usedItem.map {
+        return usedItem.map {
             when (it) {
                 is Item -> it.effects
                 is FixedItem -> it.effects

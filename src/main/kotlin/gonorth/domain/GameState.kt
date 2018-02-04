@@ -17,7 +17,7 @@ sealed class Useable
 typealias ItemEffect = GameEffect<GameState>
 data class Item(val name: String, val description: String, val ingameText: String,
                 val requiredLocation: Option<UUID>, val effects: List<ItemEffect>): Useable()
-data class FixedItem(val name: String, val description: String, val ingameText: String, val permanent: Boolean,
+data class FixedItem(val name: String, val description: String, val ingameText: String,
                      val effects: List<GameEffect<GameState>>): Useable()
 
 

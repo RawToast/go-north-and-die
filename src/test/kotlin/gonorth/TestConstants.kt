@@ -3,6 +3,7 @@ package gonorth
 import arrow.core.None
 import gonorth.domain.*
 import gonorth.free.GameEffect
+import gonorth.free.GameEffect.Destroy
 import gonorth.world.WorldBuilder
 import java.util.*
 
@@ -23,8 +24,15 @@ object TestConstants {
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",
             None, listOf(GameEffect.Describe("You try eating the key, it was not tasty.")))
 
+    val button = FixedItem("Button", "A button, looks like it's for a test",
+            " with a button on it",
+            listOf(GameEffect.Describe("The button magically disappears before your eyes!"),
+                    Destroy("Button")))
+
     val location1 = Location(startingLocationUUID,
-            "You seem to be in a test. You spot some null pointers to the west. {key}" +
+            "You seem to be in a test. You spot some null pointers to the west. " +
+                    "A large stone is nearby{button}. " +
+                    "{key}" +
                     "An alternative path heads to the east", setOf(key))
     val location2 = Location(location2UUID, "You went north and died", emptySet())
     val location3 = Location(location3UUID, "and won!", emptySet())
@@ -41,8 +49,9 @@ object TestConstants {
             .linkLocation(location1, location2, Move.NORTH, "You stumble ahead")
             .twoWayLink(location1, location3,
                     Move.EAST, Move.WEST, "You head east...", "You stroll west")
-            .placeItem(location1, Item("Key", "It's a shiny golden key.",
-                    "A key rests on the ground.", None, emptyList()))
+//            .placeItem(location1, Item("Key", "It's a shiny golden key.",
+//                    "A key rests on the ground.", None, emptyList()))
+            .placeItem(location1, button)
 
     val world = builder.world
 

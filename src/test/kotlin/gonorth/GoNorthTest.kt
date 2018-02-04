@@ -7,6 +7,7 @@ import arrow.syntax.option.some
 import gonorth.domain.Move.*
 import gonorth.domain.SimpleGameStateGenerator
 import gonorth.domain.findItem
+import gonorth.domain.findUsable
 import gonorth.domain.location
 import gonorth.free.InterpreterFactory
 import org.junit.Test
@@ -17,6 +18,7 @@ import kotlin.test.assertTrue
 class GoNorthTest {
 
     private val KEY: String = "Key"
+    private val BUTTON: String = "Button"
 
     private val factory = InterpreterFactory()
     private val goNorth = GoNorth(factory)
@@ -125,6 +127,22 @@ class GoNorthTest {
         assertTrue(newState.gameText.description.nonEmpty())
         assertFalse(newDescription.contains("key", ignoreCase = true))
         assertEquals("You seem to be in a test. You spot some null pointers to the west. " +
+                "A large stone is nearby with a button on it. " +
+                "An alternative path heads to the east", newDescription)
+    }
+
+    @Test
+    fun cannotTakeAFixedItem() {
+        assertEquals(Some(TestConstants.button), gameState.findUsable(BUTTON))
+
+        val newState = goNorth.takeAction(TestConstants.gameState, TAKE, BUTTON.some())
+        val newDescription = newState.gameText.description.getOrElse { "" }
+
+        assertTrue(newState.findUsable(BUTTON).nonEmpty(), "The button is not removed")
+        assertTrue(newState.gameText.description.nonEmpty())
+        assertTrue(newDescription.contains("button", ignoreCase = true))
+        assertEquals("You seem to be in a test. You spot some null pointers to the west. " +
+                "A large stone is nearby with a button on it. A shiny key is on the floor. " +
                 "An alternative path heads to the east", newDescription)
     }
 

@@ -9,6 +9,7 @@ import arrow.free.foldMap
 import gonorth.TestConstants
 import gonorth.domain.GameState
 import gonorth.domain.Move
+import gonorth.domain.location
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -161,5 +162,16 @@ class GameEffectInterpreterTest {
 
         assertTrue { result.player.hunger > gameState.player.hunger }
         assertTrue { result.player.hunger == 1000 }
+    }
+
+    @Test
+    fun canDestroyAnItem() {
+        val interpreter = actionInterpreter.impureGameEffectInterpreter(gameState)
+        val effect = GameEffect.destroy(TestConstants.button.name)
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { gameState.location()?.items?.size?: 0 > result.location()?.items?.size?: 0 }
     }
 }
