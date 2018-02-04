@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ActionInterpreterTest {
+class GameEffectInterpreterTest {
 
     private val actionInterpreter = InterpreterFactory()
     private val gameState = TestConstants.gameState
@@ -125,6 +125,19 @@ class ActionInterpreterTest {
                 .ev().value
 
         assertTrue { result.player.hunger < gameState.player.hunger }
+    }
+
+    @Test
+    fun canKillThePlayerUsingHunger() {
+        val interpreter = actionInterpreter.impureGameEffectInterpreter(gameState)
+        val effect = GameEffect.increaseHunger(10000)
+
+        val result = effect.foldMap(interpreter, Id.monad())
+                .ev().value
+
+        assertTrue { result.player.hunger < gameState.player.hunger }
+        assertTrue { result.player.hunger <= 0 }
+        assertFalse { result.player.alive }
     }
 
     @Test

@@ -56,7 +56,9 @@ class InterpreterFactory() {
                         Id.pure(gs)
                     }
                     is GameEffect.IncreaseHunger -> {
-                        gs = gs.copy(player = gs.player.copy(hunger = gs.player.hunger - op.amount))
+                        val newHunger = gs.player.hunger - op.amount
+                        gs = gs.copy(player = gs.player.copy(hunger = newHunger, alive = newHunger > 0))
+
                         Id.pure(gs)
                     }
                     is GameEffect.ReduceHunger -> {
