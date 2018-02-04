@@ -37,7 +37,7 @@ fun Collection<Useable>.findUsable(target: String): Option<Useable> =
         this.find {
             when (it) {
                 is Item -> it.name.equals(target, ignoreCase = true)
-                is FixedItem -> false
+                is FixedItem -> it.name.equals(target, ignoreCase = true)
             }
         }.toOption()
 
