@@ -6,8 +6,6 @@ import arrow.core.Id
 import arrow.core.IdHK
 import gonorth.domain.*
 import gonorth.world.WorldBuilder
-import javax.jws.soap.SOAPBinding
-
 
 class InterpreterFactory() {
     fun impureGameEffectInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {

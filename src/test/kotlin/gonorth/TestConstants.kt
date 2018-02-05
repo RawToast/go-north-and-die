@@ -49,8 +49,6 @@ object TestConstants {
             .linkLocation(location1, location2, Move.NORTH, "You stumble ahead")
             .twoWayLink(location1, location3,
                     Move.EAST, Move.WEST, "You head east...", "You stroll west")
-//            .placeItem(location1, Item("Key", "It's a shiny golden key.",
-//                    "A key rests on the ground.", None, emptyList()))
             .placeItem(location1, button)
 
     val world = builder.world
