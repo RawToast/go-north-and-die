@@ -178,6 +178,16 @@ class GoNorthTest {
     }
 
     @Test
+    fun canUseAFixedItem() {
+        assertEquals(Some(TestConstants.button), gameState.findUsable("buTton"))
+
+        val resultState = goNorth.use(gameState, "buTton")
+
+        assertFalse(resultState.gameText == gameState.gameText)
+        assertEquals(None, resultState.findUsable("buTton"))
+    }
+
+    @Test
     fun cannotUseAnItemThePlayerDoesNotHave() {
         val newState = goNorth.takeAction(TestConstants.gameState, TAKE, KEY.some())
         val resultState = goNorth.use(newState, "turnips")
