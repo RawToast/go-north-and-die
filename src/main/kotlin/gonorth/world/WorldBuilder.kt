@@ -47,7 +47,7 @@ class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
                 .linkLocation(to, from, returnMove, returnDescription)
     }
 
-    fun placeItem(at: Location, item: Item): WorldBuilder {
+    fun placeItem(at: Location, item: Useable): WorldBuilder {
         val newLocation = world.locations
                 .map { if (it.id == at.id) it.copy(items = it.items.plus(item)) else it }
                 .toSet()

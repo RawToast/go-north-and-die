@@ -37,9 +37,14 @@ fun Collection<Useable>.findUsable(target: String): Option<Useable> =
         this.find {
             when (it) {
                 is Item -> it.name.equals(target, ignoreCase = true)
-                is FixedItem -> false
+                is FixedItem -> it.name.equals(target, ignoreCase = true)
             }
         }.toOption()
+
+fun Useable.name(): String = when(this) {
+    is Item -> this.name
+    is FixedItem -> this.name
+}
 
 fun GameState.removeItem(target: String): GameState =
         this.copy(world = this.world.copy(locations =
@@ -50,8 +55,15 @@ fun GameState.removeItem(target: String): GameState =
                     is FixedItem -> false
                 }
             }.toSet())
-        }
-                .toSet()))
+        }.toSet()))
+
+fun GameState.removeUseable(target: String): GameState =
+        this.copy(world = this.world.copy(locations =
+        this.world.locations.map {
+            it.copy(items = it.items.filterNot {
+                it.name().equals(target, ignoreCase = true)
+            }.toSet())
+        }.toSet()))
 
 fun GameState.addToInventory(item: Item): GameState =
         this.copy(player = this.player.copy(inventory = this.player.inventory.plus(item)))

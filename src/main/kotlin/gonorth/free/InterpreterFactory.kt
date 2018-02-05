@@ -4,12 +4,8 @@ import arrow.HK
 import arrow.core.FunctionK
 import arrow.core.Id
 import arrow.core.IdHK
-import gonorth.domain.GameState
-import gonorth.domain.appendDescription
-import gonorth.domain.findLocation
-import gonorth.domain.resetGameText
+import gonorth.domain.*
 import gonorth.world.WorldBuilder
-
 
 class InterpreterFactory() {
     fun impureGameEffectInterpreter(gameState: GameState): FunctionK<GameEffect.F, IdHK> {
@@ -63,6 +59,11 @@ class InterpreterFactory() {
                     }
                     is GameEffect.ReduceHunger -> {
                         gs = gs.copy(player = gs.player.copy(hunger = Math.min(1000, gs.player.hunger + op.amount)))
+                        Id.pure(gs)
+                    }
+                    is GameEffect.Destroy -> {
+                        gs = gs.removeUseable(op.itemName)
+
                         Id.pure(gs)
                     }
                 } as Id<A>

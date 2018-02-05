@@ -4,6 +4,8 @@ import arrow.core.*
 import arrow.free.Free
 import arrow.free.flatMap
 import arrow.free.foldMap
+import arrow.syntax.collections.firstOption
+import arrow.syntax.monad.flatten
 import arrow.syntax.option.some
 import arrow.syntax.option.toOption
 import gonorth.domain.*
@@ -80,16 +82,25 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
 
 
     fun use(gameState: GameState, target: String): GameState {
-        val item = gameState.player.inventory.find { it.name.equals(target, ignoreCase = true) }
+
+        val worldItem = gameState.locationOpt()
+                .flatMap { it.items.findUsable(target) }
+
+        val item = gameState.player.inventory.findUsable(target)
+
+        val usedItem = listOf(worldItem, item).firstOption { it.nonEmpty() }.flatten().ev()
 
         val resetGameState = gameState.resetGameText()
 
-        return if (item == null) resetGameState.appendPretext("You do not have a $target")
-        else item.effects
-                .map { Free.liftF(it) }
-                .reduce { op1, op2 -> op1.flatMap { op2 } }
-                .foldMap(interpreterFactory.impureGameEffectInterpreter(resetGameState), Id.monad())
-                .ev().value
+        return usedItem.map {
+            when (it) {
+                is Item -> it.effects
+                is FixedItem -> it.effects
+            }.map { Free.liftF(it) }
+                    .reduce { op1, op2 -> op1.flatMap { op2 } }
+                    .foldMap(interpreterFactory.impureGameEffectInterpreter(resetGameState), Id.monad())
+                    .ev().value
+        }.getOrElse { resetGameState.appendPretext("You do not have a $target") }
     }
 
 
