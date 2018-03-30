@@ -4,8 +4,6 @@ import arrow.core.*
 import arrow.free.Free
 import arrow.free.flatMap
 import arrow.free.foldMap
-import arrow.syntax.collections.firstOption
-import arrow.syntax.monad.flatten
 import arrow.syntax.option.some
 import arrow.syntax.option.toOption
 import gonorth.domain.*
@@ -67,7 +65,7 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
     private fun take(gameState: GameState, target: String): GameState {
         val gameStateAfterTakingItem: Option<GameState> = gameState.moveItemToInventory(target)
 
-        val descriptionOpt = gameStateAfterTakingItem.flatMap { it.currentDescription() }
+        val descriptionOpt = gameStateAfterTakingItem.getOrElse { gameState }.currentDescription()
 
         return gameStateAfterTakingItem
                 .map { g -> g.updateGameText("You take the $target", descriptionOpt) }
