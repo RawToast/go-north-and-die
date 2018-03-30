@@ -65,30 +65,19 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
     }
 
     private fun take(gameState: GameState, target: String): GameState {
+        val gameStateAfterTakingItem: Option<GameState> = gameState.moveItemToInventory(target)
 
-        val gsWithItem = gameState.findItem(target)
-                .map { gameState.removeItem(it.name).addToInventory(it) }
-                .getOrElse { gameState }
+        val descriptionOpt = gameStateAfterTakingItem.flatMap { it.currentDescription() }
 
-        val descriptionOpt = gsWithItem.locationOpt().map { it.description }
-
-        val gsOpt: Option<GameState> = gameState.findItem(target)
-                .map { gameState.removeItem(it.name).addToInventory(it) }
-
-        return gsOpt.map { g -> g.copy(gameText = GameText("You take the $target", descriptionOpt)) }
-                .getOrElse { gsWithItem.copy(gameText = GameText("There is no $target", descriptionOpt)) }
+        return gameStateAfterTakingItem
+                .map { g -> g.updateGameText("You take the $target", descriptionOpt) }
+                .getOrElse { gameState.updateGameText("There is no $target", descriptionOpt) }
                 .updateTextWithItems()
     }
 
-
     fun use(gameState: GameState, target: String): GameState {
 
-        val worldItem = gameState.locationOpt()
-                .flatMap { it.items.findUsable(target) }
-
-        val item = gameState.player.inventory.findUsable(target)
-
-        val usedItem = listOf(worldItem, item).firstOption { it.nonEmpty() }.flatten().ev()
+        val usedItem = gameState.findPossibleUseable(target)
 
         val resetGameState = gameState.resetGameText()
 
