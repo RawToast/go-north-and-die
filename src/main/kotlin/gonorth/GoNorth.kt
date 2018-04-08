@@ -8,14 +8,17 @@ import arrow.syntax.option.some
 import arrow.syntax.option.toOption
 import gonorth.domain.*
 import gonorth.free.InterpreterFactory
+import java.util.Random
 
 class GoNorth(private val interpreterFactory: InterpreterFactory) {
 
     fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState {
-        return if (gameState.player.alive) {
-            handleActionWithTarget(move, gameState, command.getOrElse { "" })
-        } else {
-            gameState
+
+        val withNewSeed = gameState.copy(seed = Random(gameState.seed).nextLong())
+
+        return when {
+            withNewSeed.player.alive -> handleActionWithTarget(move, withNewSeed, command.getOrElse { "" })
+            else -> gameState
         }
     }
 
@@ -80,13 +83,15 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
         val resetGameState = gameState.resetGameText()
 
         return usedItem.map {
-            when (it) {
-                is Item -> it.effects
-                is FixedItem -> it.effects
+            val effects = it.effects()
+            when (effects) {
+                is FixedEffects -> effects.effects
+                is RandomEffects -> effects.fetchEffect(gameState.seed)
             }.map { Free.liftF(it) }
                     .reduce { op1, op2 -> op1.flatMap { op2 } }
                     .foldMap(interpreterFactory.impureGameEffectInterpreter(resetGameState), Id.monad())
                     .ev().value
+
         }.getOrElse { resetGameState.appendPretext("You do not have a $target") }
     }
 

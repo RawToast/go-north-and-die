@@ -24,6 +24,8 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
     data class ReduceHunger(val amount: Int) : GameEffect<GameState>()
 
     data class Destroy(val itemName: String) : GameEffect<GameState>()
+    data class RemoveItem(val itemName: String) : GameEffect<GameState>()
+
 
     data class LinkDetails(val from: UUID, val to: UUID, val move: Move, val description: String)
 
@@ -51,5 +53,8 @@ sealed class GameEffect<out A> : HK<GameEffect.F, A> {
 
         fun destroy(itemName: String): FreeEffect =
                 Free.liftF(Destroy(itemName))
+
+        fun remove(itemName: String): FreeEffect =
+                Free.liftF(RemoveItem(itemName))
     }
 }

@@ -27,15 +27,6 @@ apply plugin: 'com.adarshr.test-logger'
 apply plugin: 'kotlin-kapt'
 
 
-//sourceSets {
-//    main.kotlin.srcDirs += 'main'
-//    test {
-//        kotlin {
-//            srcDir 'test'
-//        }
-//    }
-//}
-
 mainClassName = 'gonorth.slack.SlackServerKt'
 
 // Repositories
@@ -55,15 +46,15 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    compile 'io.arrow-kt:arrow-core:0.6.0'
-    compile 'io.arrow-kt:arrow-typeclasses:0.6.0'
-    compile 'io.arrow-kt:arrow-instances:0.6.0'
-    compile 'io.arrow-kt:arrow-syntax:0.6.0'
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.0'
+    compile 'io.arrow-kt:arrow-core:0.6.1'
+    compile 'io.arrow-kt:arrow-typeclasses:0.6.1'
+    compile 'io.arrow-kt:arrow-instances:0.6.1'
+    compile 'io.arrow-kt:arrow-syntax:0.6.1'
+    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1'
 
-    compile 'io.arrow-kt:arrow-free:0.6.0'
-    compile 'io.arrow-kt:arrow-effects:0.6.0'
-    compile 'io.arrow-kt:arrow-optics:0.6.0'
+    compile 'io.arrow-kt:arrow-free:0.6.1'
+    compile 'io.arrow-kt:arrow-effects:0.6.1'
+    compile 'io.arrow-kt:arrow-optics:0.6.1'
 
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"

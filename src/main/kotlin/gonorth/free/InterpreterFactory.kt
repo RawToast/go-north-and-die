@@ -66,6 +66,11 @@ class InterpreterFactory() {
 
                         Id.pure(gs)
                     }
+                    is GameEffect.RemoveItem -> {
+                        gs = gs.removeFromInventory(op.itemName)
+
+                        Id.pure(gs)
+                    }
                 } as Id<A>
             }
         }

@@ -3,6 +3,7 @@ package gonorth
 import arrow.core.None
 import gonorth.domain.*
 import gonorth.free.GameEffect
+import gonorth.free.GameEffect.Describe
 import gonorth.free.GameEffect.Destroy
 import gonorth.world.WorldBuilder
 import java.util.*
@@ -22,16 +23,38 @@ object TestConstants {
 
 
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",
-            None, listOf(GameEffect.Describe("You try eating the key, it was not tasty.")))
+            None, FixedEffects (listOf(Describe("You try eating the key, it was not tasty."))))
 
-    val button = FixedItem("Button", "A button, looks like it's for a test",
-            " with a button on it",
-            listOf(GameEffect.Describe("The button magically disappears before your eyes!"),
-                    Destroy("Button")))
+    val button = FixedItem("Button", "You wonder what this button does",
+            " A large shiny button is beside the path.",
+            RandomEffects(
+                    listOf(
+                            WeightedEffect(25, listOf(
+                                    Describe("You press the button."),
+                                    Describe("Nothing else seems to happen. That was an anti-climax")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    Describe("You press the button."),
+                                    GameEffect.KillPlayer("And then you spontaneously implode!")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    Describe("The button magically disappears before your eyes!"),
+                                    Destroy("Button")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    Describe("After a moment to contemplate you press the button."),
+                                    Describe("Nothing seems to happen.")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    Describe("You poke the button."),
+                                    Describe("You wonder why the developers would put in such a pointless item.")
+                            ))
+                    )
+            ))
 
     val location1 = Location(startingLocationUUID,
             "You seem to be in a test. You spot some null pointers to the west. " +
-                    "A large stone is nearby{button}. " +
+                    "A large stone is nearby.{button}" +
                     "{key}" +
                     "An alternative path heads to the east", setOf(key))
     val location2 = Location(location2UUID, "You went north and died", emptySet())

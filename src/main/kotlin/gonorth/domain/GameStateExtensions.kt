@@ -1,9 +1,12 @@
 package gonorth.domain
 
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.ev
 import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
+import arrow.syntax.collections.tail
 import arrow.syntax.monad.flatten
 import arrow.syntax.option.toOption
 import java.util.*
@@ -18,7 +21,7 @@ fun GameState.locationOpt(): Option<Location> =
         this.location().toOption()
 
 fun GameState.currentDescription(): Option<String> =
-        this.locationOpt().map{ it.description }
+        this.locationOpt().map { it.description }
 
 fun GameState.fetchLinks(uuid: UUID): Option<Set<Link>> =
         this.world.links[uuid].toOption()
@@ -33,37 +36,23 @@ fun GameState.findItem(target: String): Option<Item> =
                     is Item -> true
                     is FixedItem -> false
                 }
-            }.findUsable(target)
-        } as Option<Item>
+            }.findItem(target)
+        }
 
 fun GameState.findUsable(target: String): Option<Useable> =
         this.locationOpt().flatMap { it.items.findUsable(target) }
 
-fun GameState.findUsableInCurrentLocation(target:String): Option<Useable> =
-    this.locationOpt()
-            .flatMap { it.items.findUsable(target) }
+fun GameState.findUsableInCurrentLocation(target: String): Option<Useable> =
+        this.locationOpt()
+                .flatMap { it.items.findUsable(target) }
 
-fun GameState.findUsableInInventory(target:String): Option<Useable> =
-    this.player.inventory.findUsable(target)
+fun GameState.findUsableInInventory(target: String): Option<Useable> =
+        this.player.inventory.findUsable(target)
 
-fun GameState.findPossibleUseable(target:String): Option<Useable> {
+fun GameState.findPossibleUseable(target: String): Option<Useable> {
     val worldItem = this.findUsableInCurrentLocation(target)
     val item = this.findUsableInInventory(target)
     return listOf(worldItem, item).firstOption { it.nonEmpty() }.flatten().ev()
-}
-
-
-fun Collection<Useable>.findUsable(target: String): Option<Useable> =
-        this.find {
-            when (it) {
-                is Item -> it.name.equals(target, ignoreCase = true)
-                is FixedItem -> it.name.equals(target, ignoreCase = true)
-            }
-        }.toOption()
-
-fun Useable.name(): String = when (this) {
-    is Item -> this.name
-    is FixedItem -> this.name
 }
 
 fun GameState.removeItem(target: String): GameState =
@@ -87,6 +76,10 @@ fun GameState.removeUseable(target: String): GameState =
 
 fun GameState.addToInventory(item: Item): GameState =
         this.copy(player = this.player.copy(inventory = this.player.inventory.plus(item)))
+
+fun GameState.removeFromInventory(name: String): GameState =
+        this.copy(player = this.player
+                .copy(inventory = this.player.inventory.filterNot { it.name == name }.toSet()))
 
 
 // Descriptive
@@ -131,10 +124,53 @@ fun GameState.resetGameText(): GameState =
         this.copy(gameText = this.gameText.copy(preText = "", description = this.locationOpt().map { it.description }))
                 .updateTextWithItems()
 
-fun GameState.updateGameText(preText:String, description: Option<String>): GameState =
+fun GameState.updateGameText(preText: String, description: Option<String>): GameState =
         this.copy(gameText = GameText(preText, description))
 
 fun GameState.moveItemToInventory(target: String): Option<GameState> =
         this.findItem(target)
                 .map { this.removeItem(it.name).addToInventory(it) }
 
+// Not GameState based. These are candidates for relocation
+fun Collection<Useable>.findUsable(target: String): Option<Useable> =
+        this.find {
+            when (it) {
+                is Item -> it.name.equals(target, ignoreCase = true)
+                is FixedItem -> it.name.equals(target, ignoreCase = true)
+            }
+        }.toOption()
+
+fun Collection<Useable>.findItem(target: String): Option<Item> =
+        this.findUsable(target)
+                .flatMap {
+                    when (it) {
+                        is Item -> Some(it)
+                        is FixedItem -> None
+                    }
+                }
+
+fun Useable.name(): String = when (this) {
+    is Item -> this.name
+    is FixedItem -> this.name
+}
+
+fun Useable.effects(): Effects = when (this) {
+    is Item -> this.effects
+    is FixedItem -> this.effects
+}
+
+fun RandomEffects.fetchEffect(seed: Long): List<ItemEffect> {
+    val totalWeight = this.effects.fold(1, { i, we -> we.weight + i })
+    val roll = Random(seed).nextInt(totalWeight)
+
+    tailrec fun getEffects(list: List<WeightedEffect>, acc: Int): List<ItemEffect> {
+        return when {
+            list.isEmpty() -> emptyList()
+            list.size == 1 -> list.single().effects
+            list.first().weight >= acc -> list.first().effects
+            else -> getEffects(list.tail(), acc - list.first().weight)
+        }
+    }
+
+    return getEffects(this.effects, roll)
+}

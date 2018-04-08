@@ -78,7 +78,7 @@ class GameStateExtensionsTest {
     @Test
     fun canPlaceAnItemInThePlayersInventory() {
         val test = "Test"
-        val item = Item(test, test, test, None, emptyList())
+        val item = Item(test, test, test, None, FixedEffects(emptyList()))
         val newState: GameState = gameState.addToInventory(item)
 
         assertNotNull(newState.player.inventory.firstOrNull { it.name == test })
