@@ -1,12 +1,15 @@
 package gonorth.domain
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.ev
+import arrow.core.getOrElse
 import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.tail
 import arrow.syntax.monad.flatten
 import arrow.syntax.option.toOption
-import java.util.Random
-import java.util.UUID
+import java.util.*
 
 fun GameState.location(): Location? {
     return this.world
@@ -156,8 +159,8 @@ fun Useable.effects(): Effects = when (this) {
     is FixedItem -> this.effects
 }
 
-fun RandomEffects.fetchEffect(seed:Long): List<ItemEffect> {
-    val totalWeight = this.effects.fold(1, {i, we -> we.weight + i})
+fun RandomEffects.fetchEffect(seed: Long): List<ItemEffect> {
+    val totalWeight = this.effects.fold(1, { i, we -> we.weight + i })
     val roll = Random(seed).nextInt(totalWeight)
 
     tailrec fun getEffects(list: List<WeightedEffect>, acc: Int): List<ItemEffect> {

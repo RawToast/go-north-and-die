@@ -26,7 +26,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
 
         val doorLocationUUID = UUID.randomUUID()
         val towerLocationUUID = UUID.randomUUID()
-        val BASIC_WEIGHT = 25
+        val weight25 = 25
 
         val key = Item("Key", "Shiny key, looks useful",
                 " except for a small golden key",
@@ -45,13 +45,15 @@ class SimpleGameStateGenerator : GameStateGenerator {
                         WeightedEffect(75, listOf(
                                 Describe("You start hacking away at the wooden door."),
                                 Describe("It doesn't take long before the door starts to give way."),
-                                KillPlayer("In your eagerness you take one last wild swing at the door and accidentally take off your own head.")
+                                KillPlayer("In your eagerness you take one last wild swing at the door " +
+                                        "and accidentally take off your own head.")
                         )),
-                        WeightedEffect(BASIC_WEIGHT, listOf(
+                        WeightedEffect(weight25, listOf(
                                 Describe("You start hacking away at the wooden door."),
                                 Describe("It doesn't take long before the door starts to give way."),
                                 OneWayLink(LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
-                                        "The door gives way and you enter the tower."), "You enter the tower")))
+                                        "The door gives way and you enter the tower."),
+                                        "You enter the tower")))
                 )
         ))
         val tower = Location(doorLocationUUID,
@@ -61,24 +63,24 @@ class SimpleGameStateGenerator : GameStateGenerator {
                 " A large shiny button is beside the path.",
                 RandomEffects(
                         listOf(
-                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                WeightedEffect(weight25, listOf(
                                         Describe("You press the button."),
                                         Describe("Nothing else seems to happen. That was an anti-climax")
                                 )),
-                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                WeightedEffect(weight25, listOf(
                                         Describe("You press the button."),
                                         KillPlayer("And then you spontaneously implode!")
                                 )),
-                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                WeightedEffect(weight25, listOf(
                                         Describe("After a moment to contemplate you press the button."),
                                         Describe("You feel drowsy... and fall asleep."),
                                         TeleportPlayer(tower.id, "You wake up on a dirt path.")
                                 )),
-                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                WeightedEffect(weight25, listOf(
                                         Describe("After a moment to contemplate you press the button."),
                                         Describe("Nothing seems to happen.")
                                 )),
-                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                WeightedEffect(weight25, listOf(
                                         Describe("You poke the button."),
                                         Describe("You wonder why the developers would put in such a pointless item.")
                                 ))
