@@ -80,13 +80,15 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
         val resetGameState = gameState.resetGameText()
 
         return usedItem.map {
-            when (it) {
-                is Item -> it.effects
-                is FixedItem -> it.effects
+            val effects = it.effects()
+            when (effects) {
+                is FixedEffects -> effects.effects
+                is RandomEffects -> effects.fetchEffect(gameState.seed)
             }.map { Free.liftF(it) }
                     .reduce { op1, op2 -> op1.flatMap { op2 } }
                     .foldMap(interpreterFactory.impureGameEffectInterpreter(resetGameState), Id.monad())
                     .ev().value
+
         }.getOrElse { resetGameState.appendPretext("You do not have a $target") }
     }
 

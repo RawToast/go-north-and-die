@@ -25,15 +25,57 @@ class SimpleGameStateGenerator : GameStateGenerator {
         val key = Item("Key", "Shiny key, looks useful",
                 " except for a small golden key",
                 Some(doorLocationUUID),
-                listOf(GameEffect.OneWayLink(GameEffect.LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
-                        "You open the door walk and enter the tower. The door slams shut behind you. §"),"You unlock the tower door")))
+                FixedEffects(listOf(
+                        GameEffect.Describe("The key gets stuck in the lock as you turn... but the door opens!"),
+                        GameEffect.RemoveItem("Key"),
+                        GameEffect.OneWayLink(GameEffect.LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
+                        "You open the door walk and enter the tower. The door slams shut behind you!"), "You unlock the tower door"))))
 
         val axe = Item("Axe", "Sharp looking axe",
                 " and a small axe lying next to a pile of firewood",
-                Some(doorLocationUUID), listOf(
-                    GameEffect.Describe("You start hacking away at the wooden door."),
-                    GameEffect.Describe("It doesn't take long before the door starts to give way."),
-                    GameEffect.KillPlayer("In your eagerness you take one last wild swing at the door and accidentally take off your own head.")
+                Some(doorLocationUUID), RandomEffects(
+                listOf(
+                        WeightedEffect(80, listOf(
+                                GameEffect.Describe("You start hacking away at the wooden door."),
+                                GameEffect.Describe("It doesn't take long before the door starts to give way."),
+                                GameEffect.KillPlayer("In your eagerness you take one last wild swing at the door and accidentally take off your own head.")
+                        )),
+                        WeightedEffect(20, listOf(
+                                GameEffect.Describe("You start hacking away at the wooden door."),
+                                GameEffect.Describe("It doesn't take long before the door starts to give way."),
+                                GameEffect.OneWayLink(GameEffect.LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
+                                        "The door gives way and you enter the tower."), "You enter the tower")))
+                )
+        ))
+        val tower = Location(doorLocationUUID,
+                "The path takes you to a huge stone tower with a locked wooden door.", emptySet())
+
+        val button = FixedItem("Button", "You wonder what this button does",
+                " A large shiny button is beside the path.",
+                RandomEffects(
+                listOf(
+                        WeightedEffect(25, listOf(
+                                GameEffect.Describe("You press the button."),
+                                GameEffect.Describe("Nothing else seems to happen. That was an anti-climax")
+                        )),
+                        WeightedEffect(25, listOf(
+                                GameEffect.Describe("You press the button."),
+                                GameEffect.KillPlayer("And then you spontaneously implode!")
+                        )),
+                        WeightedEffect(25, listOf(
+                                GameEffect.Describe("After a moment to contemplate you press the button."),
+                                GameEffect.Describe("You feel drowsy... and fall asleep."),
+                                GameEffect.TeleportPlayer(tower.id, "You wake up on a dirt path.")
+                        )),
+                        WeightedEffect(25, listOf(
+                                GameEffect.Describe("After a moment to contemplate you press the button."),
+                                GameEffect.Describe("Nothing seems to happen.")
+                        )),
+                        WeightedEffect(25, listOf(
+                                GameEffect.Describe("You poke the button."),
+                                GameEffect.Describe("You wonder why the developers would put in such a pointless item.")
+                        ))
+                )
         ))
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
@@ -41,12 +83,13 @@ class SimpleGameStateGenerator : GameStateGenerator {
                 "You come to a clearing in the forest where the path comes to an abrupt end. Amongst the fallen trees there are many tree stumps{axe}.", setOf(axe))
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
         val p4 = Location(UUID.randomUUID(),
-                "The road continues to the west, whilst a side path heads south.", emptySet())
+                "The road continues to the west, whilst a side path heads south.", setOf(button))
         val p5 = Location(UUID.randomUUID(), "You come to an opening in the forest. " +
                 "The path is green with moss{key}. A large river blocks your path.", setOf(key))
         val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
-        val p7 = Location(doorLocationUUID,
-                "The path takes you to a huge stone tower with a locked wooden door.", emptySet())
+
+        val p7 = tower
+
         val p8 = Location(towerLocationUUID,
                 "You walk inside the tower. Rocks fall, You die.", emptySet())
 
@@ -87,11 +130,10 @@ class SimpleGameStateGenerator : GameStateGenerator {
 class TinyGameStateGenerator : GameStateGenerator {
     override fun generate(player: Player, seed: Long): GameState {
         val key = Item("Key", "Shiny key, looks useful", "A key rests on the ground.",
-                None, listOf(GameEffect.Describe("The key is super shiny!")))
+                None, FixedEffects(listOf(GameEffect.Describe("The key is super shiny!"))))
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", setOf(key))
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
-
 
         val world = WorldBuilder().newLocation(p1)
                 .newLocation(p3)
