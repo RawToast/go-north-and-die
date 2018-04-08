@@ -83,7 +83,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
                 "You come to a clearing in the forest where the path comes to an abrupt end. Amongst the fallen trees there are many tree stumps{axe}.", setOf(axe))
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
         val p4 = Location(UUID.randomUUID(),
-                "The road continues to the west, whilst a side path heads south.", setOf(button))
+                "The road continues to the west, whilst a side path heads south. {button}", setOf(button))
         val p5 = Location(UUID.randomUUID(), "You come to an opening in the forest. " +
                 "The path is green with moss{key}. A large river blocks your path.", setOf(key))
         val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())

@@ -24,14 +24,36 @@ object TestConstants {
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",
             None, FixedEffects (listOf(GameEffect.Describe("You try eating the key, it was not tasty."))))
 
-    val button = FixedItem("Button", "A button, looks like it's for a test",
-            " with a button on it",
-            FixedEffects(listOf(GameEffect.Describe("The button magically disappears before your eyes!"),
-                    Destroy("Button"))))
+    val button = FixedItem("Button", "You wonder what this button does",
+            " A large shiny button is beside the path.",
+            RandomEffects(
+                    listOf(
+                            WeightedEffect(25, listOf(
+                                    GameEffect.Describe("You press the button."),
+                                    GameEffect.Describe("Nothing else seems to happen. That was an anti-climax")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    GameEffect.Describe("You press the button."),
+                                    GameEffect.KillPlayer("And then you spontaneously implode!")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    GameEffect.Describe("The button magically disappears before your eyes!"),
+                                    Destroy("Button")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    GameEffect.Describe("After a moment to contemplate you press the button."),
+                                    GameEffect.Describe("Nothing seems to happen.")
+                            )),
+                            WeightedEffect(25, listOf(
+                                    GameEffect.Describe("You poke the button."),
+                                    GameEffect.Describe("You wonder why the developers would put in such a pointless item.")
+                            ))
+                    )
+            ))
 
     val location1 = Location(startingLocationUUID,
             "You seem to be in a test. You spot some null pointers to the west. " +
-                    "A large stone is nearby{button}. " +
+                    "A large stone is nearby.{button}" +
                     "{key}" +
                     "An alternative path heads to the east", setOf(key))
     val location2 = Location(location2UUID, "You went north and died", emptySet())

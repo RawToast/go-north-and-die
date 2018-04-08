@@ -163,8 +163,8 @@ fun RandomEffects.fetchEffect(seed:Long): List<ItemEffect> {
         return when {
             list.isEmpty() -> emptyList()
             list.size == 1 -> list.single().effects
-            list.single().weight >= acc -> list.single().effects
-            else -> getEffects(list.tail(), acc - list.single().weight)
+            list.first().weight >= acc -> list.first().effects
+            else -> getEffects(list.tail(), acc - list.first().weight)
         }
     }
 

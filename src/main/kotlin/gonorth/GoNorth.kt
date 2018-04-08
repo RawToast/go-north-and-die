@@ -8,14 +8,17 @@ import arrow.syntax.option.some
 import arrow.syntax.option.toOption
 import gonorth.domain.*
 import gonorth.free.InterpreterFactory
+import java.util.*
 
 class GoNorth(private val interpreterFactory: InterpreterFactory) {
 
     fun takeAction(gameState: GameState, move: Move, command: Option<String>): GameState {
-        return if (gameState.player.alive) {
-            handleActionWithTarget(move, gameState, command.getOrElse { "" })
-        } else {
-            gameState
+
+        val withNewSeed = gameState.copy(seed = Random(gameState.seed).nextLong())
+
+        return when {
+            withNewSeed.player.alive -> handleActionWithTarget(move, withNewSeed, command.getOrElse { "" })
+            else -> gameState
         }
     }
 
