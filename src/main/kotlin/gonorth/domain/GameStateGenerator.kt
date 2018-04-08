@@ -97,7 +97,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
                 "The path is green with moss{key}. A large river blocks your path.", setOf(key))
         val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
 
-        val p7 = tower
+        val place7 = tower
 
         val p8 = Location(towerLocationUUID,
                 "You walk inside the tower. Rocks fall, You die.", emptySet())
@@ -109,7 +109,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
                 .newLocation(p4)
                 .newLocation(p5)
                 .newLocation(p6)
-                .newLocation(p7)
+                .newLocation(place7)
                 .newLocation(p8)
                 .twoWayLink(p1, p2, Move.EAST, Move.WEST,
                         "You take the path heading east",
@@ -124,7 +124,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
                         "You continue along the western trail",
                         "As you head west, you ponder whether println can print strings")
                 .linkLocation(p1, p3, Move.NORTH, "You stumble ahead")
-                .linkLocation(p6, p7, Move.NORTH, "You head north towards the tower")
+                .linkLocation(p6, place7, Move.NORTH, "You head north towards the tower")
                 .world
 
         val startingText = GameText(
