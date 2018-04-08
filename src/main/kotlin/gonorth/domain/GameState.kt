@@ -22,7 +22,6 @@ data class Item(val name: String, val description: String, val ingameText: Strin
 data class FixedItem(val name: String, val description: String, val ingameText: String,
                      val effects: Effects): Useable()
 
-
 sealed class Effects
 data class FixedEffects(val effects: List<ItemEffect>): Effects()
 data class RandomEffects(val effects: List<WeightedEffect>): Effects()

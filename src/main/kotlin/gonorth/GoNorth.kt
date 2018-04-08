@@ -8,7 +8,7 @@ import arrow.syntax.option.some
 import arrow.syntax.option.toOption
 import gonorth.domain.*
 import gonorth.free.InterpreterFactory
-import java.util.*
+import java.util.Random
 
 class GoNorth(private val interpreterFactory: InterpreterFactory) {
 

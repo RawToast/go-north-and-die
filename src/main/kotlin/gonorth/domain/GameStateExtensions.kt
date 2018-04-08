@@ -5,7 +5,8 @@ import arrow.syntax.collections.firstOption
 import arrow.syntax.collections.tail
 import arrow.syntax.monad.flatten
 import arrow.syntax.option.toOption
-import java.util.*
+import java.util.Random
+import java.util.UUID
 
 fun GameState.location(): Location? {
     return this.world

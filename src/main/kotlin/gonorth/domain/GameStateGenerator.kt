@@ -2,7 +2,12 @@ package gonorth.domain
 
 import arrow.core.None
 import arrow.core.Some
-import gonorth.free.GameEffect
+import gonorth.free.GameEffect.Describe
+import gonorth.free.GameEffect.KillPlayer
+import gonorth.free.GameEffect.OneWayLink
+import gonorth.free.GameEffect.RemoveItem
+import gonorth.free.GameEffect.TeleportPlayer
+import gonorth.free.GameEffect.LinkDetails
 import gonorth.world.WorldBuilder
 import java.util.*
 
@@ -21,29 +26,31 @@ class SimpleGameStateGenerator : GameStateGenerator {
 
         val doorLocationUUID = UUID.randomUUID()
         val towerLocationUUID = UUID.randomUUID()
+        val BASIC_WEIGHT = 25
 
         val key = Item("Key", "Shiny key, looks useful",
                 " except for a small golden key",
                 Some(doorLocationUUID),
                 FixedEffects(listOf(
-                        GameEffect.Describe("The key gets stuck in the lock as you turn... but the door opens!"),
-                        GameEffect.RemoveItem("Key"),
-                        GameEffect.OneWayLink(GameEffect.LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
-                        "You open the door walk and enter the tower. The door slams shut behind you!"), "You unlock the tower door"))))
+                        Describe("The key gets stuck in the lock as you turn... but the door opens!"),
+                        RemoveItem("Key"),
+                        OneWayLink(LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
+                                "You open the door walk and enter the tower. The door slams shut behind you!"),
+                                "You unlock the tower door"))))
 
         val axe = Item("Axe", "Sharp looking axe",
                 " and a small axe lying next to a pile of firewood",
                 Some(doorLocationUUID), RandomEffects(
                 listOf(
-                        WeightedEffect(80, listOf(
-                                GameEffect.Describe("You start hacking away at the wooden door."),
-                                GameEffect.Describe("It doesn't take long before the door starts to give way."),
-                                GameEffect.KillPlayer("In your eagerness you take one last wild swing at the door and accidentally take off your own head.")
+                        WeightedEffect(75, listOf(
+                                Describe("You start hacking away at the wooden door."),
+                                Describe("It doesn't take long before the door starts to give way."),
+                                KillPlayer("In your eagerness you take one last wild swing at the door and accidentally take off your own head.")
                         )),
-                        WeightedEffect(20, listOf(
-                                GameEffect.Describe("You start hacking away at the wooden door."),
-                                GameEffect.Describe("It doesn't take long before the door starts to give way."),
-                                GameEffect.OneWayLink(GameEffect.LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
+                        WeightedEffect(BASIC_WEIGHT, listOf(
+                                Describe("You start hacking away at the wooden door."),
+                                Describe("It doesn't take long before the door starts to give way."),
+                                OneWayLink(LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
                                         "The door gives way and you enter the tower."), "You enter the tower")))
                 )
         ))
@@ -53,30 +60,30 @@ class SimpleGameStateGenerator : GameStateGenerator {
         val button = FixedItem("Button", "You wonder what this button does",
                 " A large shiny button is beside the path.",
                 RandomEffects(
-                listOf(
-                        WeightedEffect(25, listOf(
-                                GameEffect.Describe("You press the button."),
-                                GameEffect.Describe("Nothing else seems to happen. That was an anti-climax")
-                        )),
-                        WeightedEffect(25, listOf(
-                                GameEffect.Describe("You press the button."),
-                                GameEffect.KillPlayer("And then you spontaneously implode!")
-                        )),
-                        WeightedEffect(25, listOf(
-                                GameEffect.Describe("After a moment to contemplate you press the button."),
-                                GameEffect.Describe("You feel drowsy... and fall asleep."),
-                                GameEffect.TeleportPlayer(tower.id, "You wake up on a dirt path.")
-                        )),
-                        WeightedEffect(25, listOf(
-                                GameEffect.Describe("After a moment to contemplate you press the button."),
-                                GameEffect.Describe("Nothing seems to happen.")
-                        )),
-                        WeightedEffect(25, listOf(
-                                GameEffect.Describe("You poke the button."),
-                                GameEffect.Describe("You wonder why the developers would put in such a pointless item.")
-                        ))
-                )
-        ))
+                        listOf(
+                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                        Describe("You press the button."),
+                                        Describe("Nothing else seems to happen. That was an anti-climax")
+                                )),
+                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                        Describe("You press the button."),
+                                        KillPlayer("And then you spontaneously implode!")
+                                )),
+                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                        Describe("After a moment to contemplate you press the button."),
+                                        Describe("You feel drowsy... and fall asleep."),
+                                        TeleportPlayer(tower.id, "You wake up on a dirt path.")
+                                )),
+                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                        Describe("After a moment to contemplate you press the button."),
+                                        Describe("Nothing seems to happen.")
+                                )),
+                                WeightedEffect(BASIC_WEIGHT, listOf(
+                                        Describe("You poke the button."),
+                                        Describe("You wonder why the developers would put in such a pointless item.")
+                                ))
+                        )
+                ))
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
         val p2 = Location(UUID.randomUUID(),
@@ -130,7 +137,7 @@ class SimpleGameStateGenerator : GameStateGenerator {
 class TinyGameStateGenerator : GameStateGenerator {
     override fun generate(player: Player, seed: Long): GameState {
         val key = Item("Key", "Shiny key, looks useful", "A key rests on the ground.",
-                None, FixedEffects(listOf(GameEffect.Describe("The key is super shiny!"))))
+                None, FixedEffects(listOf(Describe("The key is super shiny!"))))
 
         val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", setOf(key))
         val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())

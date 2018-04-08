@@ -3,6 +3,7 @@ package gonorth
 import arrow.core.None
 import gonorth.domain.*
 import gonorth.free.GameEffect
+import gonorth.free.GameEffect.Describe
 import gonorth.free.GameEffect.Destroy
 import gonorth.world.WorldBuilder
 import java.util.*
@@ -22,31 +23,31 @@ object TestConstants {
 
 
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",
-            None, FixedEffects (listOf(GameEffect.Describe("You try eating the key, it was not tasty."))))
+            None, FixedEffects (listOf(Describe("You try eating the key, it was not tasty."))))
 
     val button = FixedItem("Button", "You wonder what this button does",
             " A large shiny button is beside the path.",
             RandomEffects(
                     listOf(
                             WeightedEffect(25, listOf(
-                                    GameEffect.Describe("You press the button."),
-                                    GameEffect.Describe("Nothing else seems to happen. That was an anti-climax")
+                                    Describe("You press the button."),
+                                    Describe("Nothing else seems to happen. That was an anti-climax")
                             )),
                             WeightedEffect(25, listOf(
-                                    GameEffect.Describe("You press the button."),
+                                    Describe("You press the button."),
                                     GameEffect.KillPlayer("And then you spontaneously implode!")
                             )),
                             WeightedEffect(25, listOf(
-                                    GameEffect.Describe("The button magically disappears before your eyes!"),
+                                    Describe("The button magically disappears before your eyes!"),
                                     Destroy("Button")
                             )),
                             WeightedEffect(25, listOf(
-                                    GameEffect.Describe("After a moment to contemplate you press the button."),
-                                    GameEffect.Describe("Nothing seems to happen.")
+                                    Describe("After a moment to contemplate you press the button."),
+                                    Describe("Nothing seems to happen.")
                             )),
                             WeightedEffect(25, listOf(
-                                    GameEffect.Describe("You poke the button."),
-                                    GameEffect.Describe("You wonder why the developers would put in such a pointless item.")
+                                    Describe("You poke the button."),
+                                    Describe("You wonder why the developers would put in such a pointless item.")
                             ))
                     )
             ))
