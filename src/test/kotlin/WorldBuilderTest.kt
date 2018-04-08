@@ -1,4 +1,5 @@
 import arrow.core.None
+import gonorth.domain.FixedEffects
 import gonorth.domain.Item
 import gonorth.domain.Location
 import gonorth.domain.Move
@@ -56,7 +57,7 @@ class WorldBuilderTest {
 
     @Test
     fun canAddAnItem() {
-        val item = Item("TestItem", "Test Description", "Testing.", None, emptyList())
+        val item = Item("TestItem", "Test Description", "Testing.", None, FixedEffects(emptyList()))
         val world = worldBuilder.placeItem(p1, item).world
 
         assertTrue(world.locations.size == 1, "Only one location")
