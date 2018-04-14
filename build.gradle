@@ -54,6 +54,8 @@ dependencies {
     compile "io.arrow-kt:arrow-effects:$arrow_version"
     compile "io.arrow-kt:arrow-optics:$arrow_version"
     compile "org.jline:jline:3.6.2"
+//    compile "org.jline:console:3.6.2"
+//    compile "org.jline:console:3.6.2"
 
     testCompile 'junit:junit:4.11'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"

@@ -11,41 +11,40 @@ import org.jline.terminal.TerminalBuilder
 import java.util.*
 
 fun main(args: Array<String>) {
+    val clear = {
+        print("\u001B[H\u001B[2J")
+    }
+    clear()
+
+    val terminal: Terminal = TerminalBuilder.builder()
+            .jna(true)
+            .system(true)
+            .build()
+    terminal.enterRawMode()
+
+    fun consoleout(str: String) = println(str + "\r")
+
 
     val interpreter = InterpreterFactory()
     val goNorth = GoNorth(interpreter)
     val gameClient = ConsoleClient(goNorth, SimpleGameStateGenerator(), PossibilityGenerator())
 
-    val terminal: Terminal = TerminalBuilder.builder()
-            .jna(true)
-            .system(true)
-            .build();
-
-    terminal.enterRawMode()
-
-    val reader = terminal .reader()
-
-    val input = {Try.just(reader.read().toChar().toLowerCase()).getOrElse { ' ' }}
-
-
-
-    fun consoleout(str: String) = println(str + "\r")
-//    val input = {
-//        Try.just(System.console().readPassword().map { it.toLowerCase() }.firstOrNull() ?: ' ').getOrElse { ' ' }
-//    }
+    val input = { Try.just(terminal.reader().read().toChar().toLowerCase()).getOrElse { ' ' } }
 
     fun gameLoop(): Boolean {
+
         consoleout("")
         consoleout("****************************")
         consoleout("Welcome to Go North and Die!")
         consoleout("****************************")
         consoleout("")
-
+        consoleout("")
 
         val game = gameClient.startGame(System.currentTimeMillis())
 
-        tailrec fun playGame(gameState: GameState): Boolean =
+        tailrec fun playGame(gameState: GameState, doClear:Boolean=true): Boolean =
                 if (gameState.player.alive) {
+                    if (doClear) clear()
                     consoleout(gameState.gameText.preText)
 
                     val dsc = gameState.gameText.description.getOrElse { "" }
@@ -58,15 +57,12 @@ fun main(args: Array<String>) {
                     false
                 }
 
-        return playGame(game)
+        return playGame(game, doClear = true)
     }
-
-//    val cmd = arrayOf("/bin/sh", "-c", "stty raw </dev/tty")
-//    Runtime.getRuntime().exec(cmd).waitFor()
 
     gameLoop()
 
-    reader.close()
+    terminal.reader().close()
     terminal.close()
     System.exit(0)
 }
@@ -95,7 +91,6 @@ class ConsoleClient(private val engine: GoNorth,
     override fun takeInput(awaitInput: () -> Char, currentState: GameState): GameState {
         val consoleOutput: (String) -> Unit = { s -> println(s + "\r") }
 
-
         fun rootChoices(ic: InputChoices): List<Pair<Char, String>> {
             val mv = if (ic.movement.isNotEmpty()) listOf('q' to "Move") else emptyList()
             val ds = if (ic.describe.isNotEmpty()) listOf('w' to "Describe") else emptyList()
@@ -116,7 +111,7 @@ class ConsoleClient(private val engine: GoNorth,
             val inputChoices = parser.generate(gameState)
             val topLevelChoices = rootChoices(inputChoices)
 
-            if(topLevelChoices.isNotEmpty()) output("Moves: " + topLevelChoices.joinToString(separator = ", ") { kv -> "${kv.first}:${kv.second}" })
+            if (topLevelChoices.isNotEmpty()) output("Moves: " + topLevelChoices.joinToString(separator = ", ") { kv -> "${kv.first}:${kv.second}" })
 
             val c = input()
 
