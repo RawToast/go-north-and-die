@@ -21,6 +21,7 @@ fun main(args: Array<String>) {
 
     fun gameLoop(): Boolean {
         consoleout("")
+        consoleout("****************************")
         consoleout("Welcome to Go North and Die!")
         consoleout("****************************")
         consoleout("")
@@ -69,7 +70,7 @@ class ConsoleClient(private val engine: GoNorth,
     }
 
 
-    override fun takeInput(awaitInput: () -> Char, gameState: GameState): GameState {
+    override fun takeInput(awaitInput: () -> Char, currentSTATE: GameState): GameState {
         val consoleOutput: (String) -> Unit = { s -> println(s) }
         fun loggy(stuff: String) {
             Thread.sleep(500)
@@ -179,7 +180,7 @@ class ConsoleClient(private val engine: GoNorth,
             }
         }
 
-        return handleInputs(gameState, awaitInput, consoleOutput)
+        return handleInputs(currentSTATE, awaitInput, consoleOutput)
     }
 
 }
@@ -200,9 +201,9 @@ class PossibilityGenerator {
                 .fold(emptySelections, { m, l ->
                     when (l.move) {
                         Move.NORTH -> m.plus(Pair('w', "North"))
-                        Move.EAST -> m.plus(Pair('a', "West"))
+                        Move.EAST -> m.plus(Pair('d', "East"))
                         Move.SOUTH -> m.plus(Pair('s', "South"))
-                        Move.WEST -> m.plus(Pair('d', "East"))
+                        Move.WEST -> m.plus(Pair('a', "West"))
                         else -> m.plus(Pair('x', "???"))
                     }
                 })
