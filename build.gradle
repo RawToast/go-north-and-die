@@ -27,14 +27,14 @@ apply plugin: 'com.adarshr.test-logger'
 apply plugin: 'kotlin-kapt'
 
 
-mainClassName = 'gonorth.slack.SlackServerKt'
+mainClassName = 'gonorth.InputKt'
 
 // Repositories
 repositories {
     mavenCentral()
 
     jcenter()
-    maven { url "https://dl.bintray.com/kotlin/kotlinx" }
+    maven { url "https://dl.bintray.com/kantenkugel/maven" }
 }
 
 // Dependencies
@@ -48,7 +48,7 @@ dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
-    kapt    "io.arrow-kt:arrow-annotations-processor:$arrow_version"
+//    kapt    "io.arrow-kt:arrow-annotations-processor:$arrow_version"
 
     compile "io.arrow-kt:arrow-free:$arrow_version"
     compile "io.arrow-kt:arrow-effects:$arrow_version"
@@ -82,13 +82,13 @@ task wrapper(type: Wrapper) {
 
 test {
     testLogging {
-        outputs.upToDateWhen {false}
+        outputs.upToDateWhen { false }
     }
 }
 jar {
-//    manifest {
-//        attributes 'Main-Class': 'gonorth.slack.SlackServerKt'
-//    }
+    manifest {
+        attributes 'Main-Class': 'gonorth.InputKt'
+    }
 
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
