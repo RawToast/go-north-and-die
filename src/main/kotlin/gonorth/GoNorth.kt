@@ -4,8 +4,6 @@ import arrow.core.*
 import arrow.free.Free
 import arrow.free.flatMap
 import arrow.free.foldMap
-import arrow.syntax.option.some
-import arrow.syntax.option.toOption
 import gonorth.domain.*
 import gonorth.free.InterpreterFactory
 import java.util.Random
@@ -90,7 +88,7 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
             }.map { Free.liftF(it) }
                     .reduce { op1, op2 -> op1.flatMap { op2 } }
                     .foldMap(interpreterFactory.impureGameEffectInterpreter(resetGameState), Id.monad())
-                    .ev().value
+                    .fix().value
 
         }.getOrElse { resetGameState.appendPretext("You do not have a $target") }
     }

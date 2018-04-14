@@ -1,6 +1,6 @@
 package gonorth.free
 
-import arrow.HK
+import arrow.Kind
 import arrow.free.Free
 import arrow.free.instances.FreeMonadInstance
 import gonorth.domain.GameState
@@ -8,10 +8,10 @@ import gonorth.domain.Move
 import java.util.*
 
 typealias FreeEffect = Free<GameEffect.F, GameState>
-fun <A> HK<GameEffect.F, A>.ev(): GameEffect<A> = this as GameEffect<A>
+fun <A> Kind<GameEffect.F, A>.ev(): GameEffect<A> = this as GameEffect<A>
 
 // Free the monads!
-sealed class GameEffect<out A> : HK<GameEffect.F, A> {
+sealed class GameEffect<out A> : Kind<GameEffect.F, A> {
     sealed class F private constructor()
 
     data class Describe(val text: String) : GameEffect<GameState>()

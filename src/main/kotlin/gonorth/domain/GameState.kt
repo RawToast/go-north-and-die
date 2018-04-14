@@ -1,7 +1,6 @@
 package gonorth.domain
 
 import arrow.core.Option
-import arrow.core.Tuple2
 import gonorth.free.GameEffect
 import java.util.*
 
@@ -40,4 +39,3 @@ enum class Move {
     USE,
     EAT
 }
-

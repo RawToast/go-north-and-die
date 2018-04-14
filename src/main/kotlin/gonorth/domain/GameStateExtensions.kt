@@ -1,14 +1,7 @@
 package gonorth.domain
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.ev
-import arrow.core.getOrElse
-import arrow.syntax.collections.firstOption
+import arrow.core.*
 import arrow.syntax.collections.tail
-import arrow.syntax.monad.flatten
-import arrow.syntax.option.toOption
 import java.util.*
 
 fun GameState.location(): Location? {
@@ -31,12 +24,7 @@ fun GameState.findLocation(uuid: UUID): Option<Location> =
 
 fun GameState.findItem(target: String): Option<Item> =
         this.locationOpt().flatMap {
-            it.items.filter { i ->
-                when (i) {
-                    is Item -> true
-                    is FixedItem -> false
-                }
-            }.findItem(target)
+            it.items.onlyItems().findItem(target)
         }
 
 fun GameState.findUsable(target: String): Option<Useable> =
@@ -52,7 +40,8 @@ fun GameState.findUsableInInventory(target: String): Option<Useable> =
 fun GameState.findPossibleUseable(target: String): Option<Useable> {
     val worldItem = this.findUsableInCurrentLocation(target)
     val item = this.findUsableInInventory(target)
-    return listOf(worldItem, item).firstOption { it.nonEmpty() }.flatten().ev()
+
+    return item.or(worldItem)
 }
 
 fun GameState.removeItem(target: String): GameState =
@@ -81,7 +70,6 @@ fun GameState.removeFromInventory(name: String): GameState =
         this.copy(player = this.player
                 .copy(inventory = this.player.inventory.filterNot { it.name == name }.toSet()))
 
-
 // Descriptive
 
 fun GameState.updateTextWithItems(): GameState {
@@ -101,7 +89,7 @@ fun GameState.updateTextWithItems(): GameState {
         }
     }
             .map { it.replace(Regex(pattern = """[{]\w*[}]"""), "") }
-            .map { d -> GameText(this.gameText.preText, Option.pure(d)) }
+            .map { d -> GameText(this.gameText.preText, Option.just(d)) }
 
 
     return newDescr.foldLeft(this, { gs, gt -> gs.copy(gameText = gt) })
@@ -148,6 +136,12 @@ fun Collection<Useable>.findItem(target: String): Option<Item> =
                         is FixedItem -> None
                     }
                 }
+
+fun Collection<Useable>.onlyItems() =
+        this.filter { it is Item }
+
+fun Collection<Useable>.onlyFixed() =
+        this.filter { it is FixedItem }
 
 fun Useable.name(): String = when (this) {
     is Item -> this.name

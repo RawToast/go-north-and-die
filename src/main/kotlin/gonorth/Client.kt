@@ -7,7 +7,7 @@ import gonorth.domain.Move
 import gonorth.domain.Player
 import arrow.core.Option
 import arrow.core.Some
-import arrow.syntax.option.toOption
+import arrow.core.toOption
 import java.util.*
 
 interface GameClient {

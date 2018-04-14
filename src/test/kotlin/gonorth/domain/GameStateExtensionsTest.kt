@@ -7,7 +7,7 @@ import gonorth.TestConstants
 import gonorth.world.WorldBuilder
 import org.junit.Test
 import kotlin.test.*
-
+import arrow.core.*
 class GameStateExtensionsTest {
 
     private val gameState = TestConstants.gameState
