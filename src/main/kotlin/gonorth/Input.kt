@@ -6,6 +6,8 @@ import arrow.core.getOrElse
 import arrow.core.toOption
 import gonorth.domain.*
 import gonorth.free.InterpreterFactory
+import org.jline.terminal.Terminal
+import org.jline.terminal.TerminalBuilder
 import java.util.*
 
 fun main(args: Array<String>) {
@@ -14,10 +16,23 @@ fun main(args: Array<String>) {
     val goNorth = GoNorth(interpreter)
     val gameClient = ConsoleClient(goNorth, SimpleGameStateGenerator(), PossibilityGenerator())
 
+    val terminal: Terminal = TerminalBuilder.builder()
+            .jna(true)
+            .system(true)
+            .build();
+
+    terminal.enterRawMode()
+
+    val reader = terminal .reader()
+
+    val input = {Try.just(reader.read().toChar().toLowerCase()).getOrElse { ' ' }}
+
+
+
     fun consoleout(str: String) = println(str + "\r")
-    val input = {
-        Try.just(System.console().readPassword().map { it.toLowerCase() }.firstOrNull() ?: ' ').getOrElse { ' ' }
-    }
+//    val input = {
+//        Try.just(System.console().readPassword().map { it.toLowerCase() }.firstOrNull() ?: ' ').getOrElse { ' ' }
+//    }
 
     fun gameLoop(): Boolean {
         consoleout("")
@@ -46,10 +61,14 @@ fun main(args: Array<String>) {
         return playGame(game)
     }
 
-    val cmd = arrayOf("/bin/sh", "-c", "stty raw </dev/tty")
-    Runtime.getRuntime().exec(cmd).waitFor()
+//    val cmd = arrayOf("/bin/sh", "-c", "stty raw </dev/tty")
+//    Runtime.getRuntime().exec(cmd).waitFor()
 
     gameLoop()
+
+    reader.close()
+    terminal.close()
+    System.exit(0)
 }
 
 
@@ -97,16 +116,16 @@ class ConsoleClient(private val engine: GoNorth,
             val inputChoices = parser.generate(gameState)
             val topLevelChoices = rootChoices(inputChoices)
 
-            output("Moves: " + topLevelChoices.joinToString(separator = ", ") { kv -> "${kv.first}:${kv.second}" })
+            if(topLevelChoices.isNotEmpty()) output("Moves: " + topLevelChoices.joinToString(separator = ", ") { kv -> "${kv.first}:${kv.second}" })
 
             val c = input()
 
             return when {
                 !topLevelChoices.map { it.first }.contains(c) -> {
-                    output("Please select a valid action")
                     handleInputs(gameState, input, output)
                 }
-                c != 'q' && c != 'w' && c != 'e' && c != 'r' -> handleInputs(gameState, input, output)
+                topLevelChoices.isEmpty() ->
+                    gameState.copy(player = gameState.player.copy(alive = false))
                 c == 'q' -> {
                     val nextChoice = inputChoices.movement
 
@@ -115,7 +134,7 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = awaitInput()
 
                     return if (!nextChoice.containsKey(i2)) {
-                        output("Please select a valid action")
+//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
@@ -136,7 +155,7 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = input()
 
                     return if (!nextChoices.containsKey(i2)) {
-                        output("Please select a valid action")
+//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
@@ -150,7 +169,7 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = input()
 
                     return if (!nextChoices.containsKey(i2)) {
-                        output("Please select a valid action")
+//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
@@ -164,7 +183,7 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = input()
 
                     return if (!nextChoices.containsKey(i2)) {
-                        output("Please select a valid action")
+//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
