@@ -70,7 +70,7 @@ class ConsoleClient(private val engine: GoNorth,
     }
 
 
-    override fun takeInput(awaitInput: () -> Char, currentSTATE: GameState): GameState {
+    override fun takeInput(awaitInput: () -> Char, currentState: GameState): GameState {
         val consoleOutput: (String) -> Unit = { s -> println(s) }
         fun loggy(stuff: String) {
             Thread.sleep(500)
@@ -108,10 +108,9 @@ class ConsoleClient(private val engine: GoNorth,
                 }
                 c != 'q' && c != 'w' && c != 'e' && c != 'r' -> handleInputs(gameState, input, output)
                 c == 'q' -> {
-                    output("Choose a direction")
                     val nextChoice = inputChoices.movement
 
-                    output(inputChoices.movement.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
+                    output("Choose a direction: " + inputChoices.movement.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
 
                     val i2 = awaitInput()
 
@@ -130,10 +129,9 @@ class ConsoleClient(private val engine: GoNorth,
                     }
                 }
                 c == 'w' -> {
-                    output("Describe?")
                     val nextChoices = inputChoices.describe
 
-                    output(nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
+                    output("Describe? " + nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
 
                     val i2 = input()
 
@@ -146,9 +144,8 @@ class ConsoleClient(private val engine: GoNorth,
                     }
                 }
                 c == 'e' -> {
-                    output("Take?")
                     val nextChoices = inputChoices.take
-                    output(nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
+                    output("Take? " + nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
 
                     val i2 = input()
 
@@ -157,12 +154,13 @@ class ConsoleClient(private val engine: GoNorth,
 
                         handleInputs(gameState, input, output)
                     } else {
-                        engine.takeAction(gameState, Move.DESCRIBE, nextChoices[i2].toOption())
+                        engine.takeAction(gameState, Move.TAKE, nextChoices[i2].toOption())
                     }
                 }
                 c == 'r' -> {
-                    output("Use?")
                     val nextChoices = inputChoices.use
+                    output("Use? " + nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
+
                     val i2 = input()
 
                     return if (!nextChoices.containsKey(i2)) {
@@ -170,7 +168,7 @@ class ConsoleClient(private val engine: GoNorth,
 
                         handleInputs(gameState, input, output)
                     } else {
-                        engine.takeAction(gameState, Move.DESCRIBE, nextChoices[i2].toOption())
+                        engine.takeAction(gameState, Move.USE, nextChoices[i2].toOption())
                     }
                 }
                 else -> {
@@ -180,7 +178,7 @@ class ConsoleClient(private val engine: GoNorth,
             }
         }
 
-        return handleInputs(currentSTATE, awaitInput, consoleOutput)
+        return handleInputs(currentState, awaitInput, consoleOutput)
     }
 
 }
