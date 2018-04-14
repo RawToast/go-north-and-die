@@ -97,7 +97,7 @@ fun GameState.updateTextWithItems(): GameState {
 
 fun GameState.appendDescription(textToAppend: String): GameState =
         this.copy(gameText = this.gameText.copy(description =
-        Option(this.gameText.description.map { desc -> desc + "\n" + textToAppend }
+        Option(this.gameText.description.map { desc -> desc + "\r" + textToAppend }
                 .getOrElse { textToAppend })))
 
 

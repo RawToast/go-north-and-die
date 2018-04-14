@@ -14,7 +14,7 @@ fun main(args: Array<String>) {
     val goNorth = GoNorth(interpreter)
     val gameClient = ConsoleClient(goNorth, SimpleGameStateGenerator(), PossibilityGenerator())
 
-    fun consoleout(str: String) = println(str)
+    fun consoleout(str: String) = println(str + "\r")
     val input = {
         Try.just(System.console().readPassword().map { it.toLowerCase() }.firstOrNull() ?: ' ').getOrElse { ' ' }
     }
@@ -46,6 +46,9 @@ fun main(args: Array<String>) {
         return playGame(game)
     }
 
+    val cmd = arrayOf("/bin/sh", "-c", "stty raw </dev/tty")
+    Runtime.getRuntime().exec(cmd).waitFor()
+
     gameLoop()
 }
 
@@ -71,11 +74,8 @@ class ConsoleClient(private val engine: GoNorth,
 
 
     override fun takeInput(awaitInput: () -> Char, currentState: GameState): GameState {
-        val consoleOutput: (String) -> Unit = { s -> println(s) }
-        fun loggy(stuff: String) {
-            Thread.sleep(500)
-            consoleOutput(stuff)
-        }
+        val consoleOutput: (String) -> Unit = { s -> println(s + "\r") }
+
 
         fun rootChoices(ic: InputChoices): List<Pair<Char, String>> {
             val mv = if (ic.movement.isNotEmpty()) listOf('q' to "Move") else emptyList()

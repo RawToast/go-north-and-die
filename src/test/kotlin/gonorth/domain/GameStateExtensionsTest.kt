@@ -132,7 +132,7 @@ class GameStateExtensionsTest {
         val newState = gameStateWithDescription.appendDescription(textToAppend)
 
         assertTrue(newState.gameText.description.map { it.contains(textToAppend) }.getOrElse { false })
-        assertTrue(newState.gameText.description.map { it.contains("\n") }.getOrElse { false })
+        assertTrue(newState.gameText.description.map { it.contains("\r") }.getOrElse { false })
         assertTrue(newState.gameText.description.map {
             it.contains(TestConstants.location1.description)
         }.getOrElse { false })
@@ -146,7 +146,7 @@ class GameStateExtensionsTest {
         val newState = gameState.appendDescription(textToAppend)
 
         assertTrue(newState.gameText.description.map { it.contains(textToAppend) }.getOrElse { false })
-        assertFalse(newState.gameText.description.map { it.contains("\n") }.getOrElse { true })
+        assertFalse(newState.gameText.description.map { it.contains("\r") }.getOrElse { true })
     }
 
 }
