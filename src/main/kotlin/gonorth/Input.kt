@@ -100,7 +100,6 @@ class ConsoleClient(private val engine: GoNorth,
             return mv.plus(ds).plus(tk).plus(us)
         }
 
-
         fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
             var result = b
             this.forEach { result = f(result, it) }
@@ -129,7 +128,6 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = awaitInput()
 
                     return if (!nextChoice.containsKey(i2)) {
-//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
@@ -150,7 +148,6 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = input()
 
                     return if (!nextChoices.containsKey(i2)) {
-//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
@@ -164,7 +161,6 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = input()
 
                     return if (!nextChoices.containsKey(i2)) {
-//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
@@ -178,7 +174,6 @@ class ConsoleClient(private val engine: GoNorth,
                     val i2 = input()
 
                     return if (!nextChoices.containsKey(i2)) {
-//                        output("Please select a valid action")
 
                         handleInputs(gameState, input, output)
                     } else {
