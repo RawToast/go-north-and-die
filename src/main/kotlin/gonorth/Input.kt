@@ -57,7 +57,7 @@ fun main(args: Array<String>) {
                     false
                 }
 
-        return playGame(game, doClear = true)
+        return playGame(game, doClear = false)
     }
 
     gameLoop()
