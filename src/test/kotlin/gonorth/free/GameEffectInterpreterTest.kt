@@ -27,7 +27,7 @@ class GameEffectInterpreterTest {
 
         val result = effect.foldMap(interpreter, Id.monad())
                 .fix().value
-q
+
         assertTrue { result.gameText.description.exists { it.contains("Something happens") } }
     }
 
