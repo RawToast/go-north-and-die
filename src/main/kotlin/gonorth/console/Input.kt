@@ -1,9 +1,9 @@
-package gonorth
+package gonorth.console
 
 import arrow.core.None
 import arrow.core.getOrElse
 import arrow.core.toOption
-import gonorth.console.Console
+import gonorth.GoNorth
 import gonorth.domain.*
 import java.util.*
 

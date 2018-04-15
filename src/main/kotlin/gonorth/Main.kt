@@ -1,7 +1,9 @@
 package gonorth
 
 import arrow.core.getOrElse
+import gonorth.console.ConsoleClient
 import gonorth.console.GnConsole
+import gonorth.console.PossibilityGenerator
 import gonorth.domain.GameState
 import gonorth.domain.SimpleGameStateGenerator
 import gonorth.free.InterpreterFactory
@@ -27,7 +29,7 @@ fun main(args: Array<String>) {
         console.clear()
         console.output("")
         console.output("****************************")
-        console.output("Welcome to Go North and Die!")
+        console.output(" Go North and Die!")
         console.output("****************************")
         console.output("")
         console.output("")
