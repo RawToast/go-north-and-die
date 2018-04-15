@@ -6,20 +6,14 @@ import gonorth.free.GameEffect
 import gonorth.free.GameEffect.Describe
 import gonorth.free.GameEffect.Destroy
 import gonorth.world.WorldBuilder
-import java.util.*
-
-const val UUID1: String = "b0529be4-8c14-41d3-9283-f8dfb916a9e1"
-const val UUID2 = "4f5a80a5-7456-4777-9b6c-c8e6551f3571"
-const val UUID3 = "3aac284d-1bb9-47a2-92ef-23eb9ea26a20"
-const val UUID4 = "9d4c57fd-070d-4b0c-90cc-a25d8647d9e0"
 
 const val SEED = 1234567890L
 
 object TestConstants {
-    val startingLocationUUID = UUID.fromString(UUID1)!!
-    val location2UUID = UUID.fromString(UUID2)!!
-    val location3UUID = UUID.fromString(UUID3)!!
-    val location4UUID = UUID.fromString(UUID4)!!
+    val startingLocationUUID = "start"
+    val location2UUID = "location2"
+    val location3UUID = "location3"
+    val location4UUID = "location4"
 
 
     val key = Item("Key", "It's a shiny golden key.", "A shiny key is on the floor. ",

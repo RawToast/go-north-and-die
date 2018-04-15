@@ -1,6 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.2.21'
-    ext.ktor_version = '0.9.0'
+    ext.kotlin_version = '1.2.31'
+    ext.arrow_version = '0.7.1'
 
     repositories {
         mavenCentral()
@@ -16,9 +16,8 @@ buildscript {
 
 plugins {
     id "com.heroku.sdk.heroku-gradle" version "0.2.0"
-    id "org.jetbrains.kotlin.jvm" version "1.2.21"
+    id "org.jetbrains.kotlin.jvm" version "1.2.31"
 }
-
 
 // Plugins
 apply plugin: 'application'
@@ -27,15 +26,12 @@ apply plugin: 'com.adarshr.test-logger'
 apply plugin: 'kotlin-kapt'
 
 
-mainClassName = 'gonorth.slack.SlackServerKt'
+mainClassName = 'gonorth.MainKt'
 
 // Repositories
 repositories {
     mavenCentral()
-
     jcenter()
-    maven { url  "http://dl.bintray.com/kotlin/ktor" }
-    maven { url "https://dl.bintray.com/kotlin/kotlinx" }
 }
 
 // Dependencies
@@ -46,24 +42,17 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    compile 'io.arrow-kt:arrow-core:0.6.1'
-    compile 'io.arrow-kt:arrow-typeclasses:0.6.1'
-    compile 'io.arrow-kt:arrow-instances:0.6.1'
-    compile 'io.arrow-kt:arrow-syntax:0.6.1'
-    kapt    'io.arrow-kt:arrow-annotations-processor:0.6.1'
+    compile "io.arrow-kt:arrow-core:$arrow_version"
+    compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
 
-    compile 'io.arrow-kt:arrow-free:0.6.1'
-    compile 'io.arrow-kt:arrow-effects:0.6.1'
-    compile 'io.arrow-kt:arrow-optics:0.6.1'
-
-    compile "io.ktor:ktor-server-core:$ktor_version"
-    compile "io.ktor:ktor-server-netty:$ktor_version"
-    compile "io.ktor:ktor-jackson:$ktor_version"
+    compile "io.arrow-kt:arrow-free:$arrow_version"
+    compile "io.arrow-kt:arrow-effects:$arrow_version"
+    compile "io.arrow-kt:arrow-optics:$arrow_version"
+    compile "org.jline:jline:3.6.2"
 
     testCompile 'junit:junit:4.11'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-
-    compile ('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.2')
 }
 
 // Language Settings
@@ -90,12 +79,12 @@ task wrapper(type: Wrapper) {
 
 test {
     testLogging {
-        outputs.upToDateWhen {false}
+        outputs.upToDateWhen { false }
     }
 }
 jar {
     manifest {
-        attributes 'Main-Class': 'gonorth.slack.SlackServerKt'
+        attributes 'Main-Class': 'gonorth.MainKt'
     }
 
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }

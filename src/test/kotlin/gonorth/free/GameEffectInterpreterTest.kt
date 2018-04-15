@@ -1,7 +1,7 @@
 package gonorth.free
 
 import arrow.core.Id
-import arrow.core.ev
+import arrow.core.fix
 import arrow.core.getOrElse
 import arrow.core.monad
 import arrow.free.flatMap
@@ -26,7 +26,7 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.describe("Something happens")
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.gameText.description.exists { it.contains("Something happens") } }
     }
@@ -41,14 +41,14 @@ class GameEffectInterpreterTest {
         val result = listOf(effect1, effect2, effect3)
                 .reduce { op1, op2 -> op1.flatMap { op2 } }
                 .foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         fun descriptionIncludes(gs: GameState, text: String) =
                 gs.gameText.description.map { it.contains(text) }.getOrElse { false }
 
         assertTrue { result.gameText.description.nonEmpty() }
         assertTrue { descriptionIncludes(result, "Something happens") }
-        assertTrue { descriptionIncludes(result, "\n") }
+        assertTrue { descriptionIncludes(result, "\r") }
         assertTrue { descriptionIncludes(result, "And then something else!") }
         assertTrue { descriptionIncludes(result, "And then something moar!!!") }
     }
@@ -59,7 +59,7 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.teleportPlayer(TestConstants.location2UUID, "You are teleported")
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.gameText.description.exists { it.contains("You are teleported") } }
         assertEquals(TestConstants.location2UUID, result.currentLocation)
@@ -74,7 +74,7 @@ class GameEffectInterpreterTest {
                         Move.SOUTH, "You walk through the portal"), "A portal appears to the south")
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.gameText.description.exists { it.contains("A portal appears to the south") } }
         assertEquals(TestConstants.startingLocationUUID, result.currentLocation)
@@ -94,7 +94,7 @@ class GameEffectInterpreterTest {
                 "A portal appears to the south")
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.gameText.description.exists { it.contains("A portal appears to the south") } }
         assertEquals(TestConstants.startingLocationUUID, result.currentLocation)
@@ -111,7 +111,7 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.killThePlayer("You explode")
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.gameText.description.exists { it.contains("You explode") } }
         assertFalse { result.player.alive }
@@ -123,7 +123,7 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.increaseHunger(10)
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.player.hunger < gameState.player.hunger }
     }
@@ -134,7 +134,7 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.increaseHunger(10000)
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.player.hunger < gameState.player.hunger }
         assertTrue { result.player.hunger <= 0 }
@@ -147,7 +147,7 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.reduceHunger(10)
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.player.hunger > gameState.player.hunger }
     }
@@ -158,7 +158,7 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.reduceHunger(10000)
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
         assertTrue { result.player.hunger > gameState.player.hunger }
         assertTrue { result.player.hunger == 1000 }
@@ -170,8 +170,8 @@ class GameEffectInterpreterTest {
         val effect = GameEffect.destroy(TestConstants.button.name)
 
         val result = effect.foldMap(interpreter, Id.monad())
-                .ev().value
+                .fix().value
 
-        assertTrue { gameState.location()?.items?.size?: 0 > result.location()?.items?.size?: 0 }
+        assertTrue { gameState.location()?.items?.size ?: 0 > result.location()?.items?.size ?: 0 }
     }
 }

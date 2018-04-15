@@ -24,23 +24,23 @@ interface GameStateGenerator {
 class SimpleGameStateGenerator : GameStateGenerator {
     override fun generate(player: Player, seed: Long): GameState {
 
-        val doorLocationUUID = UUID.randomUUID()
-        val towerLocationUUID = UUID.randomUUID()
+        val doorLocation = "doorLocation"
+        val towerLocation = "tower"
         val weight25 = 25
 
         val key = Item("Key", "Shiny key, looks useful",
                 " except for a small golden key",
-                Some(doorLocationUUID),
+                Some(doorLocation),
                 FixedEffects(listOf(
                         Describe("The key gets stuck in the lock as you turn... but the door opens!"),
                         RemoveItem("Key"),
-                        OneWayLink(LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
+                        OneWayLink(LinkDetails(doorLocation, towerLocation, Move.NORTH,
                                 "You open the door walk and enter the tower. The door slams shut behind you!"),
                                 "You unlock the tower door"))))
 
         val axe = Item("Axe", "Sharp looking axe",
                 " and a small axe lying next to a pile of firewood",
-                Some(doorLocationUUID), RandomEffects(
+                Some(doorLocation), RandomEffects(
                 listOf(
                         WeightedEffect(75, listOf(
                                 Describe("You start hacking away at the wooden door."),
@@ -51,12 +51,12 @@ class SimpleGameStateGenerator : GameStateGenerator {
                         WeightedEffect(weight25, listOf(
                                 Describe("You start hacking away at the wooden door."),
                                 Describe("It doesn't take long before the door starts to give way."),
-                                OneWayLink(LinkDetails(doorLocationUUID, towerLocationUUID, Move.NORTH,
+                                OneWayLink(LinkDetails(doorLocation, towerLocation, Move.NORTH,
                                         "The door gives way and you enter the tower."),
                                         "You enter the tower")))
                 )
         ))
-        val tower = Location(doorLocationUUID,
+        val tower = Location(doorLocation,
                 "The path takes you to a huge stone tower with a locked wooden door.", emptySet())
 
         val button = FixedItem("Button", "You wonder what this button does",
@@ -87,19 +87,19 @@ class SimpleGameStateGenerator : GameStateGenerator {
                         )
                 ))
 
-        val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", emptySet())
-        val p2 = Location(UUID.randomUUID(),
+        val p1 = Location("start", "There is a fork in the path.", emptySet())
+        val p2 = Location("clearing",
                 "You come to a clearing in the forest where the path comes to an abrupt end. Amongst the fallen trees there are many tree stumps{axe}.", setOf(axe))
-        val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
-        val p4 = Location(UUID.randomUUID(),
+        val p3 = Location("north", "You went north and died.", emptySet())
+        val p4 = Location("westpath",
                 "The road continues to the west, whilst a side path heads south. {button}", setOf(button))
-        val p5 = Location(UUID.randomUUID(), "You come to an opening in the forest. " +
+        val p5 = Location("keyarea", "You come to an opening in the forest. " +
                 "The path is green with moss{key}. A large river blocks your path.", setOf(key))
-        val p6 = Location(UUID.randomUUID(), "To the north you spot a large tower.", emptySet())
+        val p6 = Location("neartower", "To the north you spot a large tower.", emptySet())
 
         val place7 = tower
 
-        val p8 = Location(towerLocationUUID,
+        val p8 = Location(towerLocation,
                 "You walk inside the tower. Rocks fall, You die.", emptySet())
 
 
@@ -141,8 +141,8 @@ class TinyGameStateGenerator : GameStateGenerator {
         val key = Item("Key", "Shiny key, looks useful", "A key rests on the ground.",
                 None, FixedEffects(listOf(Describe("The key is super shiny!"))))
 
-        val p1 = Location(UUID.randomUUID(), "There is a fork in the path.", setOf(key))
-        val p3 = Location(UUID.randomUUID(), "You went north and died.", emptySet())
+        val p1 = Location("start", "There is a fork in the path.", setOf(key))
+        val p3 = Location("north", "You went north and died.", emptySet())
 
         val world = WorldBuilder().newLocation(p1)
                 .newLocation(p3)

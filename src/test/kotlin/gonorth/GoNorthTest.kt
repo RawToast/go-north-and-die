@@ -3,7 +3,7 @@ package gonorth
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.getOrElse
-import arrow.syntax.option.some
+import arrow.core.some
 import gonorth.domain.Move.*
 import gonorth.domain.SimpleGameStateGenerator
 import gonorth.domain.findItem
