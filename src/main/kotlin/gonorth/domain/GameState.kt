@@ -25,7 +25,7 @@ data class FixedEffects(val effects: List<ItemEffect>): Effects()
 data class RandomEffects(val effects: List<WeightedEffect>): Effects()
 data class WeightedEffect(val weight: Int, val effects: List<ItemEffect>)
 
-
+const val INITIAL_HUNGER = 1000
 data class Player(val hunger: Int, val inventory: Set<Item>, val alive:Boolean)
 
 enum class Move {

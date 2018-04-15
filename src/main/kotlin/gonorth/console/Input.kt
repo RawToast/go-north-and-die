@@ -21,7 +21,7 @@ class ConsoleClient(private val engine: GoNorth,
 
     override fun startGame(seed: Long): GameState {
         val r = Random(seed).nextLong()
-        val player = Player(1000, emptySet(), alive = true)
+        val player = Player(INITIAL_HUNGER, emptySet(), alive = true)
 
 
         return worldBuilder.generate(player, r)
@@ -31,12 +31,12 @@ class ConsoleClient(private val engine: GoNorth,
     override fun takeInput(gameState: GameState): GameState {
 
         fun rootChoices(ic: InputChoices): List<Pair<Char, String>> {
-            val mv = if (ic.movement.isNotEmpty()) listOf('q' to "Move") else emptyList()
-            val ds = if (ic.describe.isNotEmpty()) listOf('w' to "Describe") else emptyList()
-            val tk = if (ic.take.isNotEmpty()) listOf('e' to "Take") else emptyList()
-            val us = if (ic.use.isNotEmpty()) listOf('r' to "Use") else emptyList()
+            val moves = if (ic.movement.isNotEmpty()) listOf('q' to "Move") else emptyList()
+            val describe = if (ic.describe.isNotEmpty()) listOf('w' to "Describe") else emptyList()
+            val take = if (ic.take.isNotEmpty()) listOf('e' to "Take") else emptyList()
+            val use = if (ic.use.isNotEmpty()) listOf('r' to "Use") else emptyList()
 
-            return mv.plus(ds).plus(tk).plus(us)
+            return moves.plus(describe).plus(take).plus(use)
         }
 
         fun handleInputs(gameState: GameState, console: Console): GameState {

@@ -58,7 +58,7 @@ class InterpreterFactory() {
                         Id.just(gs)
                     }
                     is GameEffect.ReduceHunger -> {
-                        gs = gs.copy(player = gs.player.copy(hunger = Math.min(1000, gs.player.hunger + op.amount)))
+                        gs = gs.copy(player = gs.player.copy(hunger = Math.min(INITIAL_HUNGER, gs.player.hunger + op.amount)))
                         Id.just(gs)
                     }
                     is GameEffect.Destroy -> {
