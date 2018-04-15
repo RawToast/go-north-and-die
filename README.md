@@ -4,15 +4,18 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7cdb06861b764aa3b39bc7478b787ab4)](https://www.codacy.com/app/RawToast/go-north-and-die?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RawToast/go-north-and-die&amp;utm_campaign=Badge_Grade)
 [![CircleCI](https://circleci.com/gh/RawToast/go-north-and-die.svg?style=svg)](https://circleci.com/gh/RawToast/go-north-and-die)
 
-Simple text adventure game in Kotlin.
+Simple text adventure game engine in Kotlin.
 
-## Game Server
+## Running
 
-To start a local server on port 8080 run `gradle run`
+A hardcoded sample game and be built and accessed via terminal client.
+
+`./gradlew build`
+
+`java -jar build/libs/go-north-or-die.jar`
 
 ## Tech stack:
 
+* [Kotlin](https://kotlinlang.org)
 * [Arrow](https://github.com/arrow-kt/arrow)
-* [Ktor](https://github.com/ktorio/ktor)
-* Jackson
-* Gradle
+* [Gradle](https://gradle.org)

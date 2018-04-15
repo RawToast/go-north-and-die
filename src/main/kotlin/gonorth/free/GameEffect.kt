@@ -5,7 +5,6 @@ import arrow.free.Free
 import arrow.free.instances.FreeMonadInstance
 import gonorth.domain.GameState
 import gonorth.domain.Move
-import java.util.*
 
 typealias FreeEffect = Free<GameEffect.F, GameState>
 fun <A> Kind<GameEffect.F, A>.ev(): GameEffect<A> = this as GameEffect<A>
@@ -16,7 +15,7 @@ sealed class GameEffect<out A> : Kind<GameEffect.F, A> {
 
     data class Describe(val text: String) : GameEffect<GameState>()
     data class KillPlayer(val text: String) : GameEffect<GameState>()
-    data class TeleportPlayer(val locationUUID: UUID, val text: String) : GameEffect<GameState>()
+    data class TeleportPlayer(val locationUUID: String, val text: String) : GameEffect<GameState>()
     data class OneWayLink(val link: LinkDetails, val text: String) : GameEffect<GameState>()
     data class TwoWayLink(val link: LinkDetails, val returnLink: LinkDetails, val text: String) : GameEffect<GameState>()
 
@@ -27,7 +26,7 @@ sealed class GameEffect<out A> : Kind<GameEffect.F, A> {
     data class RemoveItem(val itemName: String) : GameEffect<GameState>()
 
 
-    data class LinkDetails(val from: UUID, val to: UUID, val move: Move, val description: String)
+    data class LinkDetails(val from: String, val to: String, val move: Move, val description: String)
 
     companion object : FreeMonadInstance<F> {
         fun describe(text: String): Free<F, GameState> =
@@ -42,7 +41,7 @@ sealed class GameEffect<out A> : Kind<GameEffect.F, A> {
         fun killThePlayer(text: String): FreeEffect =
                 Free.liftF(KillPlayer(text))
 
-        fun teleportPlayer(locationUUID: UUID, text: String): FreeEffect =
+        fun teleportPlayer(locationUUID: String, text: String): FreeEffect =
                 Free.liftF(TeleportPlayer(locationUUID, text))
 
         fun increaseHunger(amount: Int): FreeEffect =

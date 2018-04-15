@@ -13,8 +13,8 @@ class WorldBuilderTest {
 
     val p1Description = "Starting to"
     val p2Description = "Other to"
-    val p1UUID = UUID.randomUUID()
-    val p2UUID = UUID.randomUUID()
+    val p1UUID = "start"
+    val p2UUID = "other"
     val p1 = Location(p1UUID, p1Description, emptySet())
     val p2 = Location(p2UUID, p2Description, emptySet())
     val worldBuilder = WorldBuilder().newLocation(p1)

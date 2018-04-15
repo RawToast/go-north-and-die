@@ -2,7 +2,6 @@ package gonorth.world
 
 import gonorth.domain.*
 import arrow.data.getOption
-import java.util.*
 
 // gonorth.domain.World data structure and building functions
 
@@ -26,7 +25,7 @@ class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
         return WorldBuilder(World(world.locations, newLinks))
     }
 
-    fun linkLocation(from: UUID, to: UUID, move: Move, description: String): WorldBuilder {
+    fun linkLocation(from: String, to: String, move: Move, description: String): WorldBuilder {
 
         val link = Link(to, move, description)
 

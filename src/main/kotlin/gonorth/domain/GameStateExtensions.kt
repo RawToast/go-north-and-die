@@ -16,10 +16,10 @@ fun GameState.locationOpt(): Option<Location> =
 fun GameState.currentDescription(): Option<String> =
         this.locationOpt().map { it.description }
 
-fun GameState.fetchLinks(uuid: UUID): Option<Set<Link>> =
+fun GameState.fetchLinks(uuid: String): Option<Set<Link>> =
         this.world.links[uuid].toOption()
 
-fun GameState.findLocation(uuid: UUID): Option<Location> =
+fun GameState.findLocation(uuid: String): Option<Location> =
         this.world.locations.find { it.id == uuid }.toOption()
 
 fun GameState.findItem(target: String): Option<Item> =
