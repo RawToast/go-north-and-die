@@ -3,7 +3,7 @@ package gonorth
 import arrow.core.getOrElse
 import gonorth.console.ConsoleClient
 import gonorth.console.GnConsole
-import gonorth.console.PossibilityGenerator
+import gonorth.console.PossibilityFilter
 import gonorth.domain.GameState
 import gonorth.domain.SimpleGameStateGenerator
 import gonorth.free.InterpreterFactory
@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
 
     val interpreter = InterpreterFactory()
     val goNorth = GoNorth(interpreter)
-    val gameClient = ConsoleClient(goNorth, console, SimpleGameStateGenerator(), PossibilityGenerator())
+    val gameClient = ConsoleClient(goNorth, console, SimpleGameStateGenerator(), PossibilityFilter())
 
     fun gameLoop(): Boolean {
 
