@@ -1,81 +1,22 @@
 package gonorth
 
 import arrow.core.None
-import arrow.core.Try
 import arrow.core.getOrElse
 import arrow.core.toOption
+import gonorth.console.Console
 import gonorth.domain.*
-import gonorth.free.InterpreterFactory
-import org.jline.terminal.Terminal
-import org.jline.terminal.TerminalBuilder
 import java.util.*
-
-fun main(args: Array<String>) {
-    val clear = {
-        print("\u001B[H\u001B[2J")
-    }
-    clear()
-
-    val terminal: Terminal = TerminalBuilder.builder()
-            .jna(true)
-            .system(true)
-            .build()
-    terminal.enterRawMode()
-
-    fun consoleout(str: String) = println(str + "\r")
-
-
-    val interpreter = InterpreterFactory()
-    val goNorth = GoNorth(interpreter)
-    val gameClient = ConsoleClient(goNorth, SimpleGameStateGenerator(), PossibilityGenerator())
-
-    val input = { Try.just(terminal.reader().read().toChar().toLowerCase()).getOrElse { ' ' } }
-
-    fun gameLoop(): Boolean {
-
-        consoleout("")
-        consoleout("****************************")
-        consoleout("Welcome to Go North and Die!")
-        consoleout("****************************")
-        consoleout("")
-        consoleout("")
-
-        val game = gameClient.startGame(System.currentTimeMillis())
-
-        tailrec fun playGame(gameState: GameState, doClear:Boolean=true): Boolean =
-                if (gameState.player.alive) {
-                    if (doClear) clear()
-                    consoleout(gameState.gameText.preText)
-
-                    val dsc = gameState.gameText.description.getOrElse { "" }
-                    if (dsc.isNotEmpty()) consoleout(dsc)
-
-                    val ns = gameClient.takeInput(input, gameState)
-                    playGame(ns)
-                } else {
-                    consoleout("Game Over")
-                    false
-                }
-
-        return playGame(game, doClear = false)
-    }
-
-    gameLoop()
-
-    terminal.reader().close()
-    terminal.close()
-    System.exit(0)
-}
 
 
 interface SimpleClient {
 
     fun startGame(seed: Long): GameState
 
-    fun takeInput(awaitInput: () -> Char, gameState: GameState): GameState
+    fun takeInput(gameState: GameState): GameState
 }
 
 class ConsoleClient(private val engine: GoNorth,
+                    private val console: Console,
                     private val worldBuilder: GameStateGenerator,
                     private val parser: PossibilityGenerator) : SimpleClient {
 
@@ -88,8 +29,7 @@ class ConsoleClient(private val engine: GoNorth,
     }
 
 
-    override fun takeInput(awaitInput: () -> Char, currentState: GameState): GameState {
-        val consoleOutput: (String) -> Unit = { s -> println(s + "\r") }
+    override fun takeInput(gameState: GameState): GameState {
 
         fun rootChoices(ic: InputChoices): List<Pair<Char, String>> {
             val mv = if (ic.movement.isNotEmpty()) listOf('q' to "Move") else emptyList()
@@ -100,96 +40,66 @@ class ConsoleClient(private val engine: GoNorth,
             return mv.plus(ds).plus(tk).plus(us)
         }
 
-        fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
-            var result = b
-            this.forEach { result = f(result, it) }
-            return result
-        }
-
-        tailrec fun handleInputs(gameState: GameState, input: () -> Char, output: (String) -> Unit): GameState {
+        fun handleInputs(gameState: GameState, console: Console): GameState {
             val inputChoices = parser.generate(gameState)
             val topLevelChoices = rootChoices(inputChoices)
 
-            if (topLevelChoices.isNotEmpty()) output("Moves: " + topLevelChoices.joinToString(separator = ", ") { kv -> "${kv.first}:${kv.second}" })
+            if (topLevelChoices.isNotEmpty())
+                console.output("Moves: " + topLevelChoices.joinToString(separator = ", ")
+                    { kv -> "${kv.first}:${kv.second}" })
 
-            val c = input()
+            fun doAction(choices: Choices, console: Console, action: Move, prefix:String=""): GameState {
+                console.output(prefix + choices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
+
+                val input = console.awaitInput()
+
+                return if (choices.containsKey(input)) engine.takeAction(gameState, action, choices[input].toOption())
+                else handleInputs(gameState, console)
+            }
+
+            val inputChar = console.awaitInput()
 
             return when {
-                !topLevelChoices.map { it.first }.contains(c) -> {
-                    handleInputs(gameState, input, output)
+                !topLevelChoices.map { it.first }.contains(inputChar) -> {
+                    handleInputs(gameState, console)
                 }
                 topLevelChoices.isEmpty() ->
                     gameState.copy(player = gameState.player.copy(alive = false))
-                c == 'q' -> {
-                    val nextChoice = inputChoices.movement
+                inputChar == 'q' -> {
+                    val choices = inputChoices.movement
+                    console.output("Choose a direction: " + inputChoices.movement.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
 
-                    output("Choose a direction: " + inputChoices.movement.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
+                    val input = console.awaitInput()
 
-                    val i2 = awaitInput()
-
-                    return if (!nextChoice.containsKey(i2)) {
-
-                        handleInputs(gameState, input, output)
-                    } else {
+                    return if (!choices.containsKey(input)) handleInputs(gameState, console)
+                    else {
                         engine.takeAction(gameState, when {
-                            (i2 == 'w') -> Move.NORTH
-                            (i2 == 'a') -> Move.WEST
-                            (i2 == 's') -> Move.SOUTH
-                            (i2 == 'd') -> Move.EAST
+                            (input == 'w') -> Move.NORTH
+                            (input == 'a') -> Move.WEST
+                            (input == 's') -> Move.SOUTH
+                            (input == 'd') -> Move.EAST
                             else -> Move.NORTH // Improve this
                         }, None)
                     }
                 }
-                c == 'w' -> {
-                    val nextChoices = inputChoices.describe
-
-                    output("Describe? " + nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
-
-                    val i2 = input()
-
-                    return if (!nextChoices.containsKey(i2)) {
-
-                        handleInputs(gameState, input, output)
-                    } else {
-                        engine.takeAction(gameState, Move.DESCRIBE, nextChoices[i2].toOption())
-                    }
-                }
-                c == 'e' -> {
-                    val nextChoices = inputChoices.take
-                    output("Take? " + nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
-
-                    val i2 = input()
-
-                    return if (!nextChoices.containsKey(i2)) {
-
-                        handleInputs(gameState, input, output)
-                    } else {
-                        engine.takeAction(gameState, Move.TAKE, nextChoices[i2].toOption())
-                    }
-                }
-                c == 'r' -> {
-                    val nextChoices = inputChoices.use
-                    output("Use? " + nextChoices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
-
-                    val i2 = input()
-
-                    return if (!nextChoices.containsKey(i2)) {
-
-                        handleInputs(gameState, input, output)
-                    } else {
-                        engine.takeAction(gameState, Move.USE, nextChoices[i2].toOption())
-                    }
-                }
+                inputChar == 'w' -> return doAction(inputChoices.describe, console, Move.DESCRIBE, "Describe? ")
+                inputChar == 'e' -> return doAction(inputChoices.take, console, Move.TAKE, "Take? ")
+                inputChar == 'r' -> return doAction(inputChoices.use, console, Move.USE, "Use? ")
                 else -> {
-                    output("Impossible state")
+                    console.output("Impossible state")
                     gameState
                 }
             }
         }
 
-        return handleInputs(currentState, awaitInput, consoleOutput)
+        return handleInputs(gameState, console)
     }
 
+    fun <K, A, B> Map<K, A>.foldLeft(b: B, f: (B, Map.Entry<K, A>) -> B): B {
+        var result = b
+        this.forEach { result = f(result, it) }
+        return result
+    }
 }
 
 typealias Choices = Map<Char, String>

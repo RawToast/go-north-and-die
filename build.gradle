@@ -16,9 +16,8 @@ buildscript {
 
 plugins {
     id "com.heroku.sdk.heroku-gradle" version "0.2.0"
-    id "org.jetbrains.kotlin.jvm" version "1.2.21"
+    id "org.jetbrains.kotlin.jvm" version "1.2.31"
 }
-
 
 // Plugins
 apply plugin: 'application'
@@ -27,14 +26,12 @@ apply plugin: 'com.adarshr.test-logger'
 apply plugin: 'kotlin-kapt'
 
 
-mainClassName = 'gonorth.InputKt'
+mainClassName = 'gonorth.MainKt'
 
 // Repositories
 repositories {
     mavenCentral()
-
     jcenter()
-    maven { url "https://dl.bintray.com/kantenkugel/maven" }
 }
 
 // Dependencies
@@ -48,14 +45,11 @@ dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
-//    kapt    "io.arrow-kt:arrow-annotations-processor:$arrow_version"
 
     compile "io.arrow-kt:arrow-free:$arrow_version"
     compile "io.arrow-kt:arrow-effects:$arrow_version"
     compile "io.arrow-kt:arrow-optics:$arrow_version"
     compile "org.jline:jline:3.6.2"
-//    compile "org.jline:console:3.6.2"
-//    compile "org.jline:console:3.6.2"
 
     testCompile 'junit:junit:4.11'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
@@ -90,7 +84,7 @@ test {
 }
 jar {
     manifest {
-        attributes 'Main-Class': 'gonorth.InputKt'
+        attributes 'Main-Class': 'gonorth.MainKt'
     }
 
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
