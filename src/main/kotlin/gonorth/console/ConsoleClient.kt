@@ -3,8 +3,12 @@ package gonorth.console
 import arrow.core.None
 import arrow.core.toOption
 import gonorth.GoNorth
-import gonorth.domain.*
-import java.util.*
+import gonorth.domain.GameState
+import gonorth.domain.GameStateGenerator
+import gonorth.domain.INITIAL_HUNGER
+import gonorth.domain.Move
+import gonorth.domain.Player
+import java.util.Random
 
 
 interface SimpleClient {
@@ -45,9 +49,9 @@ class ConsoleClient(private val engine: GoNorth,
 
             if (topLevelChoices.isNotEmpty())
                 console.output("Moves: " + topLevelChoices.joinToString(separator = ", ")
-                    { kv -> "${kv.first}:${kv.second}" })
+                { kv -> "${kv.first}:${kv.second}" })
 
-            fun doAction(choices: Choices, console: Console, action: Move, prefix:String=""): GameState {
+            fun doAction(choices: Choices, console: Console, action: Move, prefix: String = ""): GameState {
                 console.output(prefix + choices.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
 
                 val input = console.awaitInput()
@@ -66,17 +70,18 @@ class ConsoleClient(private val engine: GoNorth,
                     gameState.copy(player = gameState.player.copy(alive = false))
                 inputChar == 'q' -> {
                     val choices = inputChoices.movement
-                    console.output("Choose a direction: " + inputChoices.movement.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
+                    console.output("Choose a direction: " +
+                            inputChoices.movement.foldLeft("", { s, m -> s + m.key + ":" + m.value + " " }))
 
                     val input = console.awaitInput()
 
                     return if (!choices.containsKey(input)) handleInputs(gameState, console)
                     else {
                         engine.takeAction(gameState, when {
-                            (input == 'w') -> Move.NORTH
-                            (input == 'a') -> Move.WEST
-                            (input == 's') -> Move.SOUTH
-                            (input == 'd') -> Move.EAST
+                            input == 'w' -> Move.NORTH
+                            input == 'a' -> Move.WEST
+                            input == 's' -> Move.SOUTH
+                            input == 'd' -> Move.EAST
                             else -> Move.NORTH // Improve this
                         }, None)
                     }
