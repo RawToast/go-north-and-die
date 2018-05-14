@@ -9,7 +9,6 @@ import gonorth.free.GameEffect.RemoveItem
 import gonorth.free.GameEffect.TeleportPlayer
 import gonorth.free.GameEffect.LinkDetails
 import gonorth.world.WorldBuilder
-import java.util.*
 
 interface GameStateGenerator {
     fun generate(player: Player, seed: Long): GameState

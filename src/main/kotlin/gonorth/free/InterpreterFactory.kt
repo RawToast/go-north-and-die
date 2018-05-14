@@ -19,32 +19,36 @@ class InterpreterFactory() {
                 return when (op) {
                     is GameEffect.KillPlayer -> {
                         gs = gs.appendDescription(op.text)
-                        gs = gs.copy(player = gs.player.copy(alive = false))
+                                .let { it.copy(player = gs.player.copy(alive = false))}
                         Id.just(gs)
                     }
                     is GameEffect.TeleportPlayer -> {
                         gs = gs.appendDescription(op.text)
-                        gs = gs.copy(currentLocation = op.locationUUID)
-                        gs = gs.findLocation(op.locationUUID)
-                                .map { it.description }
-                                .fold({ gs }, { s -> gs.appendDescription(s) })
+                                .let { it.copy(currentLocation = op.locationUUID) }
+                                .let { g ->
+                                    g.findLocation(op.locationUUID)
+                                            .map { it.description }
+                                            .fold({ g }, { g.appendDescription(it) })
+                                }
                         Id.just(gs)
                     }
                     is GameEffect.OneWayLink -> {
                         gs = gs.appendDescription(op.text)
-                        gs = gs.copy(world = WorldBuilder(gs.world)
-                                .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
-                                .world)
+                                .let {
+                                    it.copy(world = WorldBuilder(gs.world)
+                                            .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
+                                            .world)
+                                }
                         Id.just(gs)
                     }
                     is GameEffect.TwoWayLink -> {
                         gs = gs.appendDescription(op.text)
-                        gs = gs.copy(world = WorldBuilder(gs.world)
-                                .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
-                                .world)
-                        gs = gs.copy(world = WorldBuilder(gs.world)
-                                .linkLocation(op.returnLink.from, op.returnLink.to, op.returnLink.move, op.returnLink.description)
-                                .world)
+                                .let {
+                                    it.copy(world = WorldBuilder(it.world)
+                                            .linkLocation(op.link.from, op.link.to, op.link.move, op.link.description)
+                                            .linkLocation(op.returnLink.from, op.returnLink.to, op.returnLink.move, op.returnLink.description)
+                                            .world)
+                                }
                         Id.just(gs)
                     }
                     is GameEffect.Describe -> {

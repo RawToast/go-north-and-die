@@ -185,7 +185,6 @@ class GoNorthTest {
         val resultState = goNorth.use(gameState, "buTton")
 
         assertFalse(resultState.gameText == gameState.gameText)
-//        assertEquals(None, resultState.findUsable("buTton"))
     }
 
     @Test

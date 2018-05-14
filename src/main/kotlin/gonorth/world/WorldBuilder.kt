@@ -3,8 +3,6 @@ package gonorth.world
 import gonorth.domain.*
 import arrow.data.getOption
 
-// gonorth.domain.World data structure and building functions
-
 class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
 
     fun newLocation(location: Location): WorldBuilder {
@@ -18,7 +16,7 @@ class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
         val x: Set<Link> = world.links.getOption(from.id)
                 .map { it.filterNot { l -> l.to == to.id && move == l.move } }
                 .map { it.plus(link) }
-                .fold({ setOf(link) }, { l -> l.toSet() })
+                .fold({ setOf(link) }, { it.toSet() })
 
         val newLinks = world.links.plus(Pair(from.id, x))
 
@@ -32,7 +30,7 @@ class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
         val x: Set<Link> = world.links.getOption(from)
                 .map { it.filterNot { l -> l.to == to && move == l.move } }
                 .map { it.plus(link) }
-                .fold({ setOf(link) }, { l -> l.toSet() })
+                .fold({ setOf(link) }, { it.toSet() })
 
         val newLinks = world.links.plus(Pair(from, x))
 

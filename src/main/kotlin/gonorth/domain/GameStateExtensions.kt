@@ -7,7 +7,7 @@ import java.util.*
 fun GameState.location(): Location? {
     return this.world
             .locations
-            .find { (id) -> id == this.currentLocation }
+            .find { it.id == this.currentLocation }
 }
 
 fun GameState.locationOpt(): Option<Location> =
@@ -89,7 +89,7 @@ fun GameState.updateTextWithItems(): GameState {
         }
     }
             .map { it.replace(Regex(pattern = """[{]\w*[}]"""), "") }
-            .map { d -> GameText(this.gameText.preText, Option.just(d)) }
+            .map { GameText(this.gameText.preText, Option.just(it)) }
 
 
     return newDescr.foldLeft(this, { gs, gt -> gs.copy(gameText = gt) })
@@ -118,40 +118,6 @@ fun GameState.updateGameText(preText: String, description: Option<String>): Game
 fun GameState.moveItemToInventory(target: String): Option<GameState> =
         this.findItem(target)
                 .map { this.removeItem(it.name).addToInventory(it) }
-
-// Not GameState based. These are candidates for relocation
-fun Collection<Useable>.findUsable(target: String): Option<Useable> =
-        this.find {
-            when (it) {
-                is Item -> it.name.equals(target, ignoreCase = true)
-                is FixedItem -> it.name.equals(target, ignoreCase = true)
-            }
-        }.toOption()
-
-fun Collection<Useable>.findItem(target: String): Option<Item> =
-        this.findUsable(target)
-                .flatMap {
-                    when (it) {
-                        is Item -> Some(it)
-                        is FixedItem -> None
-                    }
-                }
-
-fun Collection<Useable>.onlyItems() =
-        this.filter { it is Item }
-
-fun Collection<Useable>.onlyFixed() =
-        this.filter { it is FixedItem }
-
-fun Useable.name(): String = when (this) {
-    is Item -> this.name
-    is FixedItem -> this.name
-}
-
-fun Useable.effects(): Effects = when (this) {
-    is Item -> this.effects
-    is FixedItem -> this.effects
-}
 
 fun RandomEffects.fetchEffect(seed: Long): List<ItemEffect> {
     val totalWeight = this.effects.fold(1, { i, we -> we.weight + i })

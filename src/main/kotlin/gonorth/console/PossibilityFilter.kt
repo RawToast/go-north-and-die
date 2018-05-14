@@ -16,9 +16,9 @@ class PossibilityFilter {
                 .fold(emptySelections, { m, l ->
                 when (l.move) {
                 Move.NORTH -> m.plus(Pair('w', "North"))
-        Move.EAST -> m.plus(Pair('d', "East"))
-        Move.SOUTH -> m.plus(Pair('s', "South"))
-        Move.WEST -> m.plus(Pair('a', "West"))
+                Move.EAST -> m.plus(Pair('d', "East"))
+                Move.SOUTH -> m.plus(Pair('s', "South"))
+                Move.WEST -> m.plus(Pair('a', "West"))
                         else -> m.plus(Pair('x', "???"))
                     }
                 })

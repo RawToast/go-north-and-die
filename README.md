@@ -8,7 +8,7 @@ Simple text adventure game engine in Kotlin.
 
 ## Running
 
-A hardcoded sample game and be built and accessed via terminal client.
+A hardcoded sample game can be built and then accessed via the terminal client.
 
 `./gradlew build`
 
