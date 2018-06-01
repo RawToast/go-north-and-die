@@ -2,6 +2,7 @@ package gonorth.console
 
 import arrow.core.None
 import arrow.core.toOption
+import arrow.data.k
 import gonorth.GoNorth
 import gonorth.domain.GameState
 import gonorth.domain.GameStateGenerator
