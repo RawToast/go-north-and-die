@@ -12,9 +12,8 @@ import gonorth.domain.World
 
 class WorldBuilder(val world: World = World(emptySet(), emptyMap())) {
 
-    fun newLocation(location: Location): WorldBuilder {
-        return WorldBuilder(this.world.copy(locations = this.world.locations.plus(location)))
-    }
+    fun newLocation(location: Location): WorldBuilder =
+            WorldBuilder(this.world.copy(locations = this.world.locations.plus(location)))
 
     fun linkLocation(from: Location, to: Location, move: Move, description: String): WorldBuilder {
 

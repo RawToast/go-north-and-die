@@ -4,7 +4,6 @@ import arrow.core.*
 import arrow.free.Free
 import arrow.free.flatMap
 import arrow.free.foldMap
-import arrow.syntax.collections.tail
 import gonorth.domain.*
 import gonorth.free.InterpreterFactory
 import java.util.Random
@@ -33,13 +32,6 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
     }
 
     private fun handleMovement(gameState: GameState, move: Move): Option<GameState> {
-
-
-        val listy = listOf(1,2,3)
-
-        listy.tail()
-
-
 
         val linkToNewLocation: Option<Link> = gameState.locationOpt()
                 .flatMap { gameState.fetchLinks(it.id) }
