@@ -24,21 +24,21 @@ class ConsoleClient(private val engine: GoNorth,
                     private val parser: PossibilityFilter) : SimpleClient {
 
     override fun startGame(seed: Long): GameState {
-        val r = Random(seed).nextLong()
+        val seed = Random(seed).nextLong()
         val player = Player(INITIAL_HUNGER, emptySet(), alive = true)
 
 
-        return worldBuilder.generate(player, r)
+        return worldBuilder.generate(player, seed)
     }
 
 
     override fun takeInput(gameState: GameState): GameState {
 
-        fun rootChoices(ic: InputChoices): List<Pair<Char, String>> {
-            val moves = if (ic.movement.isNotEmpty()) listOf('q' to "Move") else emptyList()
-            val describe = if (ic.describe.isNotEmpty()) listOf('w' to "Describe") else emptyList()
-            val take = if (ic.take.isNotEmpty()) listOf('e' to "Take") else emptyList()
-            val use = if (ic.use.isNotEmpty()) listOf('r' to "Use") else emptyList()
+        fun rootChoices(inputChoices: InputChoices): List<Pair<Char, String>> {
+            val moves = if (inputChoices.movement.isNotEmpty()) listOf('q' to "Move") else emptyList()
+            val describe = if (inputChoices.describe.isNotEmpty()) listOf('w' to "Describe") else emptyList()
+            val take = if (inputChoices.take.isNotEmpty()) listOf('e' to "Take") else emptyList()
+            val use = if (inputChoices.use.isNotEmpty()) listOf('r' to "Use") else emptyList()
 
             return moves.plus(describe).plus(take).plus(use)
         }
@@ -77,12 +77,13 @@ class ConsoleClient(private val engine: GoNorth,
 
                     return if (!choices.containsKey(input)) handleInputs(gameState, console)
                     else {
-                        engine.takeAction(gameState, when {
-                            input == 'w' -> Move.NORTH
-                            input == 'a' -> Move.WEST
-                            input == 's' -> Move.SOUTH
-                            input == 'd' -> Move.EAST
-                            else -> Move.NORTH // Improve this
+                        engine.takeAction(gameState, when (input) {
+                            'w' -> Move.NORTH
+                            'a' -> Move.WEST
+                            's' -> Move.SOUTH
+                            'd' -> Move.EAST
+                            else -> Move.NORTH
+                        // Improve this
                         }, None)
                     }
                 }

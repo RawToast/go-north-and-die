@@ -5,9 +5,8 @@ import arrow.core.getOrElse
 import org.jline.terminal.Terminal
 
 class GnConsole(private val terminal: Terminal) : Console {
-    override fun output(text: String) {
+    override fun output(text: String) =
         println(text + "\r")
-    }
 
     override fun awaitInput(): Char =
         Try {
@@ -17,9 +16,8 @@ class GnConsole(private val terminal: Terminal) : Console {
                     .toLowerCase()
         }.getOrElse { ' ' }
 
-    override fun clear() {
+    override fun clear() =
         print("\u001B[H\u001B[2J")
-    }
 
     override fun close() {
         terminal.reader().close()
@@ -32,9 +30,9 @@ interface Console {
 
     fun awaitInput(): Char
 
-    fun output(text: String): Unit
+    fun output(text: String)
 
-    fun clear(): Unit
+    fun clear()
 
-    fun close(): Unit
+    fun close()
 }

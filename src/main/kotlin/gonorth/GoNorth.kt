@@ -32,6 +32,7 @@ class GoNorth(private val interpreterFactory: InterpreterFactory) {
     }
 
     private fun handleMovement(gameState: GameState, move: Move): Option<GameState> {
+
         val linkToNewLocation: Option<Link> = gameState.locationOpt()
                 .flatMap { gameState.fetchLinks(it.id) }
                 .flatMap { it.find { it.move == move }.toOption() }
