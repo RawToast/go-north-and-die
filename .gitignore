@@ -57,3 +57,11 @@ freeline_project_description.json
 
 # Lib
 lib/
+
+# MacOs
+.DS_Store
+
+# Gradles
+gradlew
+gradlew.bat
+gradle/wrapper/
