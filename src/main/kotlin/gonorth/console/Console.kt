@@ -1,6 +1,6 @@
 package gonorth.console
 
-import arrow.core.Try
+import arrow.core.Either
 import arrow.core.getOrElse
 import org.jline.terminal.Terminal
 
@@ -9,11 +9,11 @@ class GnConsole(private val terminal: Terminal) : Console {
         println(text + "\r")
 
     override fun awaitInput(): Char =
-        Try {
+        Either.catch {
             terminal.reader()
                     .read()
                     .toChar()
-                    .toLowerCase()
+                    .lowercaseChar()
         }.getOrElse { ' ' }
 
     override fun clear() =

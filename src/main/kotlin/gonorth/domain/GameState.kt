@@ -13,7 +13,7 @@ data class Location(val id: String, val description: String, val items: Set<Usea
 data class Link(val to: String, val move: Move, val description: String)
 
 sealed class Useable
-typealias ItemEffect = GameEffect<GameState>
+typealias ItemEffect = GameEffect//<GameState>
 
 data class Item(val name: String, val description: String, val ingameText: String,
                 val requiredLocation: Option<String>, val effects: Effects): Useable()

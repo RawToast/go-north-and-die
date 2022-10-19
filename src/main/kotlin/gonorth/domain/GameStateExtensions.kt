@@ -1,7 +1,6 @@
 package gonorth.domain
 
 import arrow.core.*
-import arrow.syntax.collections.tail
 import java.util.*
 
 fun GameState.location(): Location? {
@@ -89,7 +88,7 @@ fun GameState.updateTextWithItems(): GameState {
         }
     }
             .map { it.replace(Regex(pattern = """[{]\w*[}]"""), "") }
-            .map { GameText(this.gameText.preText, Option.just(it)) }
+            .map { GameText(this.gameText.preText, Option(it)) }
 
 
     return newDescr.foldLeft(this, { gs, gt -> gs.copy(gameText = gt) })
